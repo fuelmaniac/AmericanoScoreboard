@@ -1,0 +1,1132 @@
+<!DOCTYPE html>
+<html lang="tr">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>🃏 Americano Oyun Takip Sistemi</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        body { 
+            margin: 0; 
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        }
+        .hidden { display: none !important; }
+        .fade-in { 
+            opacity: 0;
+            animation: fadeIn 0.3s ease forwards;
+        }
+        @keyframes fadeIn {
+            to { opacity: 1; }
+        }
+    </style>
+</head>
+<body>
+    <div id="app" class="max-w-7xl mx-auto p-6 min-h-screen transition-colors bg-gradient-to-br from-purple-50 to-blue-100">
+        
+        <!-- Setup Screen -->
+        <div id="setupScreen" class="max-w-4xl mx-auto">
+            <div class="bg-white rounded-2xl shadow-xl p-8">
+                <div class="text-center mb-8">
+                    <div class="flex items-center justify-center gap-3 mb-4">
+                        <div class="w-8 h-8 text-purple-600 flex items-center justify-center">⚙️</div>
+                        <h1 class="text-3xl font-bold text-gray-800">🃏 Americano Oyun Kurulumu</h1>
+                    </div>
+                    <p class="text-gray-600">Oyuncu sayısı ve isimlerini ayarlayın</p>
+                </div>
+
+                <!-- Player Count Section -->
+                <div class="rounded-xl p-6 mb-6 bg-blue-50">
+                    <h3 class="font-bold text-lg mb-4 text-center text-gray-800">Oyuncu Sayısı</h3>
+                    <div class="flex items-center justify-center gap-4">
+                        <button id="removePlayerBtn" class="p-3 rounded-lg font-bold transition-all bg-gray-300 text-gray-500 cursor-not-allowed">
+                            ➖
+                        </button>
+                        <div id="playerCountDisplay" class="text-4xl font-bold text-purple-600 rounded-lg py-3 px-6 shadow-inner min-w-[80px] text-center bg-white">
+                            3
+                        </div>
+                        <button id="addPlayerBtn" class="p-3 rounded-lg font-bold transition-all bg-green-500 text-white hover:bg-green-600">
+                            ➕
+                        </button>
+                    </div>
+                    <p class="text-center mt-2 text-gray-600">3-5 oyuncu</p>
+                </div>
+
+                <!-- Player Names Section -->
+                <div class="rounded-xl p-6 mb-6 bg-yellow-50">
+                    <h3 class="font-bold text-lg mb-4 text-center text-gray-800">Oyuncu İsimleri</h3>
+                    <div id="playerInputs" class="grid gap-4 grid-cols-3">
+                        <!-- Player inputs will be dynamically generated -->
+                    </div>
+                </div>
+
+                <!-- Game Stake Section -->
+                <div class="rounded-xl p-6 mb-6 bg-orange-50">
+                    <h3 class="font-bold text-lg mb-4 text-center text-gray-800">Bu Oyun Neye Oynanıyor?</h3>
+                    <div class="mb-4">
+                        <input type="text" id="gameStakeInput" class="w-full p-3 border border-gray-300 rounded-lg text-center font-medium text-lg"
+                               placeholder="Örnek: Kahve ısmarlama, Yemek ısmarlama..." />
+                    </div>
+                    <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
+                        <button onclick="setStake('Kahve ısmarlama')" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">☕ Kahve</button>
+                        <button onclick="setStake('Yemek ısmarlama')" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">🍕 Yemek</button>
+                        <button onclick="setStake('Dondurma ısmarlama')" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">🍦 Dondurma</button>
+                        <button onclick="setStake('Sadece eğlence')" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">🎉 Eğlence</button>
+                        <button onclick="setStake('💰 Para')" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">💰 Para</button>
+                        <button onclick="setCustomStake()" class="p-2 rounded-lg text-sm bg-blue-100 hover:bg-blue-200 text-blue-800 transition-colors">✏️ Özel</button>
+                    </div>
+                </div>
+
+                <!-- Start Button -->
+                <div class="text-center">
+                    <button id="startGameBtn" class="px-8 py-4 rounded-lg font-bold text-white text-xl transition-all bg-gray-400 cursor-not-allowed">
+                        🎯 Oyunu Başlat
+                    </button>
+                    <div id="startGameError" class="text-red-500 mt-2 text-sm hidden">Lütfen tüm oyuncu isimlerini doldurun</div>
+                    <div id="gameStakeDisplay" class="mt-3 p-2 bg-orange-100 rounded-lg hidden">
+                        <p class="text-orange-800 text-sm">🏆 Bu oyun: <strong id="gameStakeText"></strong></p>
+                    </div>
+                </div>
+
+                <!-- Rules Section -->
+                <div class="bg-green-50 rounded-xl p-6 mt-6">
+                    <h3 class="font-bold text-lg text-gray-800 mb-3">Oyun Kuralları:</h3>
+                    <ul class="space-y-2 text-gray-700">
+                        <li>• <strong>3, 4 veya 5 oyuncuyla</strong> oynanır</li>
+                        <li>• <strong>13 farklı ceza</strong> türü vardır</li>
+                        <li>• <strong>"Elden" cezası</strong> mecburen son elde (13. el) oynanır</li>
+                        <li>• <strong>Cezayı söyleyen VE bitiren</strong> aynı kişiyse +50 puan</li>
+                        <li>• <strong>Cezayı söyleyen başarısız:</strong> Görevini yapamadan (açamadan) başkası bitirirse x2 ceza puanı alır</li>
+                        <li>• <strong>Son elde (Elden) bonus yok:</strong> Cezayı söyleyip bitiren +50 alamaz</li>
+                        <li>• <strong>İşler kağıt atan</strong> oyuncu -50 ceza puanı alır</li>
+                        <li>• <strong>Joker ile bitiren</strong> herkese x2 ceza puanı yedirir</li>
+                        <li>• <strong>Kazanma:</strong> En yüksek puan kazanır (eksi puanlarda en düşük eksi puan)</li>
+                    </ul>
+                </div>
+            </div>
+        </div>
+
+        <!-- Game Screen -->
+        <div id="gameScreen" class="hidden rounded-2xl shadow-xl p-8 bg-white">
+            
+            <!-- Game Header -->
+            <div class="text-center mb-8">
+                <div class="flex items-center justify-center gap-3 mb-4">
+                    <div class="w-8 h-8 text-purple-600 flex items-center justify-center">▶️</div>
+                    <h1 class="text-3xl font-bold text-gray-800">🃏 Americano</h1>
+                    <button onclick="backToSetup()" class="ml-4 p-2 transition-all rounded-lg text-gray-500 hover:text-gray-700" title="Ayarlara dön">
+                        ⚙️
+                    </button>
+                    <button id="darkModeBtn" onclick="toggleDarkMode()" class="ml-2 p-2 rounded-lg transition-all bg-gray-200 text-gray-700 hover:bg-gray-300" title="Gece modu">
+                        🌙
+                    </button>
+                </div>
+                <p id="playersDisplay" class="text-gray-600"></p>
+                <div class="mt-2 text-lg font-semibold text-purple-600">
+                    El <span id="currentRoundDisplay">1</span> - <span id="remainingPenaltiesDisplay">13</span>/13 ceza kaldı
+                </div>
+                <div id="gameStakeGameDisplay" class="mt-2 text-sm text-orange-600 hidden">
+                    🏆 Bu oyun: <strong id="gameStakeGameText"></strong>
+                </div>
+            </div>
+
+            <!-- Leader Banner -->
+            <div id="leaderBanner" class="p-4 rounded-xl mb-6 text-center bg-gradient-to-r from-purple-400 to-blue-500 text-white hidden">
+                <div class="flex items-center justify-center gap-2">
+                    <div class="w-6 h-6 flex items-center justify-center">🏆</div>
+                    <span id="leaderText" class="font-bold text-lg"></span>
+                </div>
+            </div>
+
+            <!-- Score Cards -->
+            <div id="scoreCards" class="grid gap-4 mb-8 grid-cols-3">
+                <!-- Score cards will be dynamically generated -->
+            </div>
+
+            <!-- Round Input Section -->
+            <div id="roundInputSection" class="bg-blue-50 rounded-xl p-6 mb-6">
+                <h3 class="font-bold text-lg text-gray-800 mb-4">El <span id="roundInputTitle">1</span> - Puan Girişi</h3>
+                
+                <!-- Penalty and Caller Selection -->
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Bu Elde Oynanan Ceza:</label>
+                        <select id="selectedPenalty" class="w-full p-3 border border-gray-300 rounded-lg font-medium text-lg">
+                            <option value="">Ceza seçin...</option>
+                        </select>
+                    </div>
+                    
+                    <div>
+                        <label class="block text-sm font-medium text-gray-700 mb-2">Cezayı Söyleyen Oyuncu:</label>
+                        <select id="penaltyCaller" class="w-full p-3 border border-gray-300 rounded-lg font-medium text-lg">
+                            <option value="">Oyuncu seçin...</option>
+                        </select>
+                    </div>
+                </div>
+                
+                <!-- Player Input Cards -->
+                <div id="playerInputCards" class="grid gap-4 mb-6 grid-cols-3">
+                    <!-- Player input cards will be dynamically generated -->
+                </div>
+                
+                <!-- Calculate Button -->
+                <div class="text-center">
+                    <div id="warningMessages">
+                        <!-- Warning messages will be dynamically added here -->
+                    </div>
+                    
+                    <button id="calculateBtn" onclick="calculateRoundScore()" class="px-8 py-3 rounded-lg font-bold text-white transition-all bg-gray-400 cursor-not-allowed">
+                        Tüm Alanları Doldurun
+                    </button>
+                </div>
+            </div>
+
+            <!-- Game Over -->
+            <div id="gameOverSection" class="bg-gradient-to-r from-green-400 to-blue-500 text-white p-6 rounded-xl mb-6 text-center hidden">
+                <h2 class="text-2xl font-bold mb-2">🎉 OYUN BİTTİ! 🎉</h2>
+                <p id="gameOverText" class="text-lg"></p>
+            </div>
+
+            <!-- Game History Table -->
+            <div id="gameHistorySection" class="bg-gray-50 rounded-xl p-6 mb-6 hidden">
+                <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
+                    <div class="w-5 h-5 flex items-center justify-center">📊</div>
+                    Kümülatif Puan Tablosu
+                </h3>
+                <div class="overflow-x-auto">
+                    <table id="gameHistoryTable" class="w-full border-collapse bg-white rounded-lg overflow-hidden shadow">
+                        <thead id="gameHistoryTableHead">
+                            <!-- Table header will be dynamically generated -->
+                        </thead>
+                        <tbody id="gameHistoryTableBody">
+                            <!-- Table body will be dynamically generated -->
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Remaining Penalties -->
+            <div class="bg-yellow-50 rounded-xl p-6 mb-6">
+                <h3 class="font-bold text-lg text-gray-800 mb-4 text-center">
+                    Kalan Cezalar - <span id="remainingCount">13</span>/13
+                </h3>
+                <div id="remainingPenalties" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                    <!-- Remaining penalties will be dynamically generated -->
+                </div>
+            </div>
+
+            <!-- Control Buttons -->
+            <div class="flex gap-4 justify-center flex-wrap">
+                <button onclick="showRules()" class="font-bold py-3 px-6 rounded-lg transition-all bg-blue-500 hover:bg-blue-600 text-white">
+                    📖 Kuralları Oku
+                </button>
+                <button onclick="backToSetup()" class="font-bold py-3 px-6 rounded-lg transition-all hover:scale-105 flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white">
+                    <div class="w-5 h-5 flex items-center justify-center">⚙️</div>
+                    Oyuncu Ayarları
+                </button>
+                <button onclick="resetGame()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg transition-all hover:scale-105 flex items-center gap-2">
+                    <div class="w-5 h-5 flex items-center justify-center">🔄</div>
+                    Yeni Oyun Başlat
+                </button>
+            </div>
+        </div>
+
+        <!-- Rules Modal -->
+        <div id="rulesModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div class="max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white">
+                <div class="sticky top-0 p-6 border-b bg-white border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <h2 class="text-2xl font-bold text-gray-800">📖 Detaylı Americano Kuralları</h2>
+                        <button onclick="closeRules()" class="p-2 rounded-lg transition-all bg-gray-100 hover:bg-gray-200 text-gray-700">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <div class="space-y-6 text-gray-700">
+                        <div>
+                            <h5 class="font-semibold text-lg mb-3 text-blue-700">🎯 Oyun Malzemeleri:</h5>
+                            <ul class="space-y-1 ml-4">
+                                <li>• <strong>52'lik deste + 4 Joker</strong> ile oynanan kağıt oyunudur</li>
+                                <li>• <strong>Min 3, Max 5 kişi</strong> ile oynanır</li>
+                                <li>• <strong>Her oyuncuya 13 kağıt</strong> dağıtılır</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h5 class="font-semibold text-lg mb-3 text-blue-700">📚 Terimler Sözlüğü:</h5>
+                            <ul class="space-y-1 ml-4">
+                                <li>• <strong>Küt:</strong> Aynı rakamın farklı kart çeşitleri (örnek: 3♠, 3♥, 3♦)</li>
+                                <li>• <strong>Seri:</strong> Bir kart çeşidinin sıralı şekilde bulunması (örnek: 2♠, 3♠, 4♠)</li>
+                                <li>• <strong>Joker:</strong> İstenilen kart yerine geçer</li>
+                                <li>• <strong>İşler Kağıt:</strong> Yere atılan ve başka oyuncuya yaramayan kart (-50 puan)</li>
+                                <li>• <strong>Ceza Kartı:</strong> Sırası olmayan oyuncunun çektiği ekstra kart</li>
+                            </ul>
+                        </div>
+
+                        <div>
+                            <h5 class="font-semibold text-lg mb-3 text-blue-700">🏆 Puan Sistemi:</h5>
+                            <ul class="space-y-1 ml-4">
+                                <li>• <strong>Cezayı söyleyen + bitiren:</strong> +50 bonus puan</li>
+                                <li>• <strong>Cezayı söyleyen başarısız:</strong> Görevini yapamadan (açamadan) başkası bitirirse x2 ceza puanı alır</li>
+                                <li>• <strong>İşler kağıt atan:</strong> -50 ceza puanı</li>
+                                <li>• <strong>Joker ile bitiren:</strong> Herkese x2 ceza puanı</li>
+                                <li>• <strong>Son elde bonus yok:</strong> Elden cezasında +50 bonus alınamaz</li>
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // Game state variables
+        let gameState = {
+            gameStarted: false,
+            playerCount: 3,
+            players: ['Sabri', 'Şadiye', 'Gökhan'],
+            darkMode: false,
+            gameStake: '',
+            currentRound: 1,
+            selectedPenalty: '',
+            penaltyCaller: '',
+            roundPenalties: {},
+            roundWinner: '',
+            işlerKağıtAtan: '',
+            jokerIleBitiren: '',
+            cezayıSöyleyenAçamadı: '',
+            gameHistory: [],
+            playedPenalties: {}
+        };
+
+        const penalties = [
+            { id: 1, name: "3'lü Seri", short: "3S", symbol: "①" },
+            { id: 2, name: "3'lü Küt", short: "3K", symbol: "②" },
+            { id: 3, name: "3'lü Seri + 3'lü Küt", short: "3S3K", symbol: "③" },
+            { id: 4, name: "2 3'lü Seri", short: "23S", symbol: "④" },
+            { id: 5, name: "2 3'lü Küt", short: "23K", symbol: "⑤" },
+            { id: 6, name: "4'lü Seri", short: "4S", symbol: "⑥" },
+            { id: 7, name: "4'lü Küt", short: "4K", symbol: "⑦" },
+            { id: 8, name: "4 Seri 4 Küt", short: "4S4K", symbol: "⑧" },
+            { id: 9, name: "2 4'lü Seri", short: "24S", symbol: "⑨" },
+            { id: 10, name: "2 4'lü Küt", short: "24K", symbol: "⑩" },
+            { id: 11, name: "5'li Seri", short: "5S", symbol: "⑪" },
+            { id: 12, name: "Çift", short: "Ç", symbol: "⑫" },
+            { id: 13, name: "Elden", short: "E", symbol: "⑬" }
+        ];
+
+        // Initialize the app
+        function initApp() {
+            updatePlayerInputs();
+            updatePlayerCount();
+            updateStartButton();
+            initEventListeners();
+        }
+
+        function initEventListeners() {
+            document.getElementById('addPlayerBtn').addEventListener('click', addPlayer);
+            document.getElementById('removePlayerBtn').addEventListener('click', removePlayer);
+            document.getElementById('startGameBtn').addEventListener('click', startGame);
+            document.getElementById('gameStakeInput').addEventListener('input', updateGameStake);
+        }
+
+        function addPlayer() {
+            if (gameState.playerCount < 5) {
+                gameState.playerCount++;
+                gameState.players.push(`Oyuncu ${gameState.playerCount}`);
+                updatePlayerInputs();
+                updatePlayerCount();
+                updateStartButton();
+            }
+        }
+
+        function removePlayer() {
+            if (gameState.playerCount > 3) {
+                gameState.playerCount--;
+                gameState.players.pop();
+                updatePlayerInputs();
+                updatePlayerCount();
+                updateStartButton();
+            }
+        }
+
+        function updatePlayerCount() {
+            document.getElementById('playerCountDisplay').textContent = gameState.playerCount;
+            
+            const removeBtn = document.getElementById('removePlayerBtn');
+            const addBtn = document.getElementById('addPlayerBtn');
+            
+            if (gameState.playerCount <= 3) {
+                removeBtn.className = 'p-3 rounded-lg font-bold transition-all bg-gray-300 text-gray-500 cursor-not-allowed';
+            } else {
+                removeBtn.className = 'p-3 rounded-lg font-bold transition-all bg-red-500 text-white hover:bg-red-600';
+            }
+            
+            if (gameState.playerCount >= 5) {
+                addBtn.className = 'p-3 rounded-lg font-bold transition-all bg-gray-300 text-gray-500 cursor-not-allowed';
+            } else {
+                addBtn.className = 'p-3 rounded-lg font-bold transition-all bg-green-500 text-white hover:bg-green-600';
+            }
+        }
+
+        function updatePlayerInputs() {
+            const container = document.getElementById('playerInputs');
+            const gridClass = gameState.playerCount === 3 ? 'grid-cols-3' : 
+                             gameState.playerCount === 4 ? 'grid-cols-2 md:grid-cols-4' : 
+                             'grid-cols-2 md:grid-cols-3 lg:grid-cols-5';
+            
+            container.className = `grid gap-4 ${gridClass}`;
+            container.innerHTML = '';
+            
+            gameState.players.forEach((player, index) => {
+                const playerDiv = document.createElement('div');
+                playerDiv.className = 'rounded-lg p-4 bg-white';
+                playerDiv.innerHTML = `
+                    <label class="block text-sm font-medium mb-2 text-gray-700">Oyuncu ${index + 1}</label>
+                    <input type="text" value="${player}" onchange="updatePlayerName(${index}, this.value)"
+                           class="w-full p-3 border border-gray-300 rounded-lg text-center font-medium text-lg bg-white text-black placeholder-gray-400"
+                           placeholder="Oyuncu ${index + 1}" />
+                `;
+                container.appendChild(playerDiv);
+            });
+        }
+
+        function updatePlayerName(index, name) {
+            gameState.players[index] = name;
+            updateStartButton();
+        }
+
+        function updateStartButton() {
+            const allFilled = gameState.players.every(player => player.trim() !== '');
+            const startBtn = document.getElementById('startGameBtn');
+            const errorDiv = document.getElementById('startGameError');
+            
+            if (allFilled) {
+                startBtn.className = 'px-8 py-4 rounded-lg font-bold text-white text-xl transition-all bg-purple-600 hover:bg-purple-700 hover:scale-105';
+                errorDiv.classList.add('hidden');
+            } else {
+                startBtn.className = 'px-8 py-4 rounded-lg font-bold text-white text-xl transition-all bg-gray-400 cursor-not-allowed';
+                errorDiv.classList.remove('hidden');
+            }
+        }
+
+        function setStake(stake) {
+            gameState.gameStake = stake;
+            document.getElementById('gameStakeInput').value = stake;
+            updateGameStakeDisplay();
+        }
+
+        function setCustomStake() {
+            const custom = prompt('Özel iddia yazın:');
+            if (custom) {
+                setStake(custom);
+            }
+        }
+
+        function updateGameStake() {
+            gameState.gameStake = document.getElementById('gameStakeInput').value;
+            updateGameStakeDisplay();
+        }
+
+        function updateGameStakeDisplay() {
+            const display = document.getElementById('gameStakeDisplay');
+            const text = document.getElementById('gameStakeText');
+            
+            if (gameState.gameStake) {
+                text.textContent = gameState.gameStake;
+                display.classList.remove('hidden');
+            } else {
+                display.classList.add('hidden');
+            }
+        }
+
+        function startGame() {
+            const allFilled = gameState.players.every(player => player.trim() !== '');
+            if (!allFilled) return;
+            
+            gameState.gameStarted = true;
+            gameState.roundPenalties = {};
+            gameState.players.forEach(player => {
+                gameState.roundPenalties[player] = '';
+            });
+            
+            document.getElementById('setupScreen').classList.add('hidden');
+            document.getElementById('gameScreen').classList.remove('hidden');
+            
+            updateGameScreen();
+        }
+
+        function backToSetup() {
+            gameState.gameStarted = false;
+            document.getElementById('setupScreen').classList.remove('hidden');
+            document.getElementById('gameScreen').classList.add('hidden');
+            resetGame();
+        }
+
+        function toggleDarkMode() {
+            gameState.darkMode = !gameState.darkMode;
+            const app = document.getElementById('app');
+            const btn = document.getElementById('darkModeBtn');
+            
+            if (gameState.darkMode) {
+                app.className = app.className.replace('bg-gradient-to-br from-purple-50 to-blue-100', 'bg-gray-900');
+                btn.textContent = '☀️';
+                btn.title = 'Gündüz modu';
+                btn.className = 'ml-2 p-2 rounded-lg transition-all bg-yellow-500 text-gray-900 hover:bg-yellow-400';
+            } else {
+                app.className = app.className.replace('bg-gray-900', 'bg-gradient-to-br from-purple-50 to-blue-100');
+                btn.textContent = '🌙';
+                btn.title = 'Gece modu';
+                btn.className = 'ml-2 p-2 rounded-lg transition-all bg-gray-200 text-gray-700 hover:bg-gray-300';
+            }
+        }
+
+        function updateGameScreen() {
+            document.getElementById('playersDisplay').textContent = gameState.players.join(' - ');
+            document.getElementById('currentRoundDisplay').textContent = gameState.currentRound;
+            document.getElementById('roundInputTitle').textContent = gameState.currentRound;
+            
+            updateRemainingPenalties();
+            updateScoreCards();
+            updatePenaltySelector();
+            updatePlayerSelector();
+            updatePlayerInputCards();
+            updateGameStakeGameDisplay();
+        }
+
+        function updateGameStakeGameDisplay() {
+            const display = document.getElementById('gameStakeGameDisplay');
+            const text = document.getElementById('gameStakeGameText');
+            
+            if (gameState.gameStake) {
+                text.textContent = gameState.gameStake;
+                display.classList.remove('hidden');
+            } else {
+                display.classList.add('hidden');
+            }
+        }
+
+        function getRemainingPenalties() {
+            return penalties.filter(p => !gameState.playedPenalties[p.id]);
+        }
+
+        function getAvailablePenalties() {
+            const available = getRemainingPenalties();
+            if (available.length > 1 && available.some(p => p.id === 13)) {
+                return available.filter(penalty => penalty.id !== 13);
+            }
+            return available;
+        }
+
+        function updateRemainingPenalties() {
+            const remaining = getRemainingPenalties();
+            document.getElementById('remainingPenaltiesDisplay').textContent = remaining.length;
+            document.getElementById('remainingCount').textContent = remaining.length;
+            
+            const container = document.getElementById('remainingPenalties');
+            container.innerHTML = '';
+            
+            const available = getAvailablePenalties();
+            
+            if (available.length > 0) {
+                available.forEach(penalty => {
+                    const div = document.createElement('div');
+                    div.className = 'bg-white p-3 rounded-lg border-2 border-yellow-200 hover:border-yellow-400 transition-all';
+                    div.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <span class="bg-yellow-100 text-yellow-800 font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm">
+                                ${penalty.symbol}
+                            </span>
+                            <div>
+                                <div class="font-medium text-gray-800">${penalty.name}</div>
+                                <div class="text-xs text-gray-500">(${penalty.short})</div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+                
+                if (!gameState.playedPenalties[13] && available.length > 0) {
+                    const eldenDiv = document.createElement('div');
+                    eldenDiv.className = 'bg-red-50 p-3 rounded-lg border-2 border-red-200';
+                    eldenDiv.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <span class="bg-red-100 text-red-800 font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm">⑬</span>
+                            <div>
+                                <div class="font-medium text-red-700">Elden</div>
+                                <div class="text-xs text-red-500">(E) - Son elde mecburi</div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(eldenDiv);
+                }
+            } else {
+                const message = document.createElement('div');
+                message.className = 'text-center text-gray-500 py-4';
+                message.innerHTML = `<p class="text-lg">${remaining.length === 1 ? 'Son el - Sadece "Elden" kaldı! 🎯' : 'Tüm cezalar oynandı! 🎉'}</p>`;
+                container.appendChild(message);
+            }
+        }
+
+        function getCurrentScores() {
+            const scores = {};
+            gameState.players.forEach(player => {
+                scores[player] = 0;
+            });
+            
+            gameState.gameHistory.forEach(round => {
+                round.results.forEach(result => {
+                    scores[result.player] += result.totalChange;
+                });
+            });
+            
+            return scores;
+        }
+
+        function getLeader() {
+            const scores = getCurrentScores();
+            const maxScore = Math.max(...Object.values(scores));
+            if (maxScore <= 0) return null;
+            return Object.keys(scores).find(player => scores[player] === maxScore);
+        }
+
+        function updateScoreCards() {
+            const scores = getCurrentScores();
+            const leader = getLeader();
+            const container = document.getElementById('scoreCards');
+            const gridClass = gameState.playerCount === 3 ? 'grid-cols-3' : 
+                             gameState.playerCount === 4 ? 'grid-cols-2 md:grid-cols-4' : 
+                             'grid-cols-2 md:grid-cols-3 lg:grid-cols-5';
+            
+            container.className = `grid gap-4 mb-8 ${gridClass}`;
+            container.innerHTML = '';
+            
+            gameState.players.forEach(player => {
+                const score = scores[player] || 0;
+                const scoreClass = score >= 0 ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
+                
+                const div = document.createElement('div');
+                div.className = 'rounded-xl p-6 border text-center bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200';
+                div.innerHTML = `
+                    <h3 class="font-bold text-lg mb-2 text-gray-800">${player}</h3>
+                    <div class="text-3xl font-bold rounded-lg py-3 px-4 shadow-inner ${scoreClass}">
+                        ${score > 0 ? '+' : ''}${score}
+                    </div>
+                    <div class="text-sm mt-1 text-gray-500">toplam puan</div>
+                `;
+                container.appendChild(div);
+            });
+            
+            // Update leader banner
+            const leaderBanner = document.getElementById('leaderBanner');
+            const leaderText = document.getElementById('leaderText');
+            
+            if (leader) {
+                leaderText.textContent = `Lider: ${leader} (${scores[leader]} puan)`;
+                leaderBanner.classList.remove('hidden');
+            } else {
+                leaderBanner.classList.add('hidden');
+            }
+        }
+
+        function updatePenaltySelector() {
+            const select = document.getElementById('selectedPenalty');
+            const remaining = getRemainingPenalties();
+            const available = getAvailablePenalties();
+            
+            select.innerHTML = '<option value="">Ceza seçin...</option>';
+            
+            if (remaining.length === 1 && remaining[0].id === 13) {
+                select.innerHTML = '';
+                const option = document.createElement('option');
+                option.value = '13';
+                option.textContent = '⑬ Elden (Son El - Mecburi)';
+                option.selected = true;
+                select.appendChild(option);
+                select.style.backgroundColor = '#fef2f2';
+                select.style.color = '#b91c1c';
+                gameState.selectedPenalty = '13';
+            } else {
+                available.forEach(penalty => {
+                    const option = document.createElement('option');
+                    option.value = penalty.id;
+                    option.textContent = `${penalty.symbol} ${penalty.name} (${penalty.short})`;
+                    select.appendChild(option);
+                });
+                select.style.backgroundColor = '';
+                select.style.color = '';
+            }
+            
+            select.addEventListener('change', function() {
+                gameState.selectedPenalty = this.value;
+                updateCalculateButton();
+            });
+        }
+
+        function updatePlayerSelector() {
+            const select = document.getElementById('penaltyCaller');
+            select.innerHTML = '<option value="">Oyuncu seçin...</option>';
+            
+            gameState.players.forEach(player => {
+                const option = document.createElement('option');
+                option.value = player;
+                option.textContent = player;
+                select.appendChild(option);
+            });
+            
+            select.addEventListener('change', function() {
+                gameState.penaltyCaller = this.value;
+                updatePlayerInputCards();
+                updateCalculateButton();
+            });
+        }
+
+        function updatePlayerInputCards() {
+            const container = document.getElementById('playerInputCards');
+            const gridClass = gameState.playerCount === 3 ? 'grid-cols-3' : 
+                             gameState.playerCount === 4 ? 'grid-cols-2 md:grid-cols-4' : 
+                             'grid-cols-2 md:grid-cols-3 lg:grid-cols-5';
+            
+            container.className = `grid gap-4 mb-6 ${gridClass}`;
+            container.innerHTML = '';
+            
+            gameState.players.forEach(player => {
+                const div = document.createElement('div');
+                div.className = 'bg-white rounded-lg p-4';
+                
+                const isWinner = gameState.roundWinner === player;
+                const penaltyInput = isWinner ? 
+                    `<div class="w-full p-4 border border-gray-200 rounded-xl text-center font-bold text-2xl bg-green-50 text-green-600 h-16 flex items-center justify-center">
+                        0 (Eli Bitirdi)
+                     </div>` :
+                    `<input type="number" min="0" max="13" value="${gameState.roundPenalties[player] || ''}" 
+                            onchange="updatePlayerPenalty('${player}', this.value)"
+                            class="w-full p-4 border border-gray-300 rounded-xl text-center font-bold text-2xl h-16" placeholder="0" />
+                     <div class="text-sm text-gray-500 mt-2 text-center font-medium">
+                        <span id="penalty-preview-${player}">-${gameState.roundPenalties[player] || 0} puan</span>
+                     </div>`;
+                
+                div.innerHTML = `
+                    <h4 class="font-semibold text-center mb-3">${player}</h4>
+                    
+                    <div class="mb-3">
+                        <label class="block text-sm font-medium text-gray-700 mb-1">Bu Elde Ceza Sayısı</label>
+                        ${penaltyInput}
+                    </div>
+                    
+                    <button onclick="toggleRoundWinner('${player}')" 
+                            class="w-full py-2 px-3 rounded-lg font-medium transition-all mb-2 ${isWinner ? 'bg-green-500 text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}">
+                        ${isWinner ? '✓ Eli Bitirdi' : 'Eli Bitirdi'}
+                    </button>
+                    
+                    <button onclick="toggleJokerWinner('${player}')" 
+                            class="w-full py-2 px-3 rounded-lg font-medium transition-all mb-2 ${gameState.jokerIleBitiren === player ? 'bg-orange-500 text-white shadow-lg' : 'bg-orange-100 text-orange-700 hover:bg-orange-200'}">
+                        ${gameState.jokerIleBitiren === player ? '✓ Joker İle Bitirdi' : 'Joker İle Bitirdi'}
+                    </button>
+                    
+                    <button onclick="toggleIslerKagit('${player}')" 
+                            class="w-full py-2 px-3 rounded-lg font-medium transition-all mb-2 ${gameState.işlerKağıtAtan === player ? 'bg-red-500 text-white shadow-lg' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
+                        ${gameState.işlerKağıtAtan === player ? '✓ İşler Kağıt Attı' : 'İşler Kağıt Attı'}
+                    </button>
+                    
+                    <button onclick="toggleFailedCaller('${player}')" 
+                            ${gameState.penaltyCaller !== player ? 'disabled' : ''}
+                            class="w-full py-2 px-3 rounded-lg font-medium transition-all ${gameState.penaltyCaller !== player 
+                                ? 'bg-gray-200 text-gray-400 cursor-not-allowed'
+                                : gameState.cezayıSöyleyenAçamadı === player
+                                ? 'bg-purple-500 text-white shadow-lg'
+                                : 'bg-purple-100 text-purple-700 hover:bg-purple-200'}">
+                        ${gameState.penaltyCaller !== player 
+                            ? 'Sadece Ceza Söyleyen İçin'
+                            : gameState.cezayıSöyleyenAçamadı === player ? '✓ Görevini Açamadı' : 'Görevini Açamadı'
+                        }
+                    </button>
+                    
+                    <div id="status-${player}" class="text-center text-xs font-medium mt-1">
+                        ${getPlayerStatus(player)}
+                    </div>
+                `;
+                
+                container.appendChild(div);
+            });
+            
+            updatePenaltyPreviews();
+        }
+
+        function getPlayerStatus(player) {
+            const isWinner = gameState.roundWinner === player;
+            const isCaller = gameState.penaltyCaller === player;
+            const isJoker = gameState.jokerIleBitiren === player;
+            const isIsler = gameState.işlerKağıtAtan === player;
+            const isFailed = gameState.cezayıSöyleyenAçamadı === player;
+            
+            let status = [];
+            
+            if (isWinner && isCaller && gameState.selectedPenalty !== '13') {
+                status.push('<div class="text-green-600">+50 bonus puan (Söyledi ve Bitirdi)</div>');
+            } else if (isWinner && isCaller && gameState.selectedPenalty === '13') {
+                status.push('<div class="text-gray-500">Son elde bonus yok (Elden kuralı)</div>');
+            }
+            
+            if (isJoker) {
+                status.push('<div class="text-orange-600">🃏 Joker etkisi: Herkese x2 ceza puanı</div>');
+            }
+            
+            if (isIsler) {
+                status.push('<div class="text-red-600">-50 ceza puanı (İşler kağıt)</div>');
+            }
+            
+            if (isFailed) {
+                status.push('<div class="text-purple-600">x2 ceza puanı (Görevini açamadı)</div>');
+            }
+            
+            return status.join('');
+        }
+
+        function updatePlayerPenalty(player, value) {
+            gameState.roundPenalties[player] = value;
+            updatePenaltyPreviews();
+            updateCalculateButton();
+        }
+
+        function updatePenaltyPreviews() {
+            gameState.players.forEach(player => {
+                const preview = document.getElementById(`penalty-preview-${player}`);
+                if (preview) {
+                    const baseValue = parseInt(gameState.roundPenalties[player]) || 0;
+                    let multiplier = 1;
+                    let effects = [];
+                    
+                    if (gameState.cezayıSöyleyenAçamadı === player && gameState.cezayıSöyleyenAçamadı !== '') {
+                        multiplier *= 2;
+                        effects.push('x2 Görevini açamadı');
+                    }
+                    
+                    if (gameState.jokerIleBitiren && gameState.jokerIleBitiren !== '') {
+                        multiplier *= 2;
+                        effects.push('x2 Joker etkisi');
+                    }
+                    
+                    const finalValue = baseValue * multiplier;
+                    
+                    if (effects.length > 0) {
+                        preview.innerHTML = `<span class="text-red-600 font-bold">-${finalValue} puan (${effects.join(' + ')})</span>`;
+                    } else {
+                        preview.textContent = `-${baseValue} puan`;
+                    }
+                }
+            });
+        }
+
+        function toggleRoundWinner(player) {
+            gameState.roundWinner = gameState.roundWinner === player ? '' : player;
+            updatePlayerInputCards();
+            updateCalculateButton();
+        }
+
+        function toggleJokerWinner(player) {
+            gameState.jokerIleBitiren = gameState.jokerIleBitiren === player ? '' : player;
+            if (gameState.jokerIleBitiren === player) {
+                gameState.roundWinner = player;
+            }
+            updatePlayerInputCards();
+            updateCalculateButton();
+        }
+
+        function toggleIslerKagit(player) {
+            gameState.işlerKağıtAtan = gameState.işlerKağıtAtan === player ? '' : player;
+            updatePlayerInputCards();
+        }
+
+        function toggleFailedCaller(player) {
+            gameState.cezayıSöyleyenAçamadı = gameState.cezayıSöyleyenAçamadı === player ? '' : player;
+            updatePlayerInputCards();
+            updatePenaltyPreviews();
+        }
+
+        function canCalculate() {
+            const allPenaltiesFilled = gameState.players.every(player => 
+                player === gameState.roundWinner ? true : gameState.roundPenalties[player] !== undefined && gameState.roundPenalties[player] !== ''
+            );
+            return gameState.selectedPenalty !== '' && gameState.penaltyCaller !== '' && gameState.roundWinner !== '' && allPenaltiesFilled;
+        }
+
+        function updateCalculateButton() {
+            const btn = document.getElementById('calculateBtn');
+            const canCalc = canCalculate();
+            
+            if (canCalc) {
+                btn.className = 'px-8 py-3 rounded-lg font-bold text-white transition-all bg-purple-600 hover:bg-purple-700 hover:scale-105';
+                btn.textContent = 'Eli Kaydet ve Sonrakine Geç';
+            } else {
+                btn.className = 'px-8 py-3 rounded-lg font-bold text-white transition-all bg-gray-400 cursor-not-allowed';
+                btn.textContent = 'Tüm Alanları Doldurun';
+            }
+            
+            updateWarningMessages();
+        }
+
+        function updateWarningMessages() {
+            const container = document.getElementById('warningMessages');
+            container.innerHTML = '';
+            
+            if (gameState.cezayıSöyleyenAçamadı) {
+                const div = document.createElement('div');
+                div.className = 'mb-4 p-3 bg-purple-100 rounded-lg border border-purple-300';
+                div.innerHTML = `
+                    <p class="text-purple-800 font-medium">💜 Cezayı Söyleyen Görevini Açamadı!</p>
+                    <p class="text-sm text-purple-700 mt-1">${gameState.cezayıSöyleyenAçamadı} cezayı söyledi ama görevini açamadı - x2 ceza puanı alacak</p>
+                `;
+                container.appendChild(div);
+            }
+            
+            if (gameState.selectedPenalty === '13') {
+                const div = document.createElement('div');
+                div.className = 'mb-4 p-3 bg-blue-100 rounded-lg border border-blue-300';
+                div.innerHTML = `
+                    <p class="text-blue-800 font-medium">⚠️ Son El (Elden) Kuralı</p>
+                    <p class="text-sm text-blue-700 mt-1">Bu elde cezayı söyleyip bitiren oyuncu +50 bonus alamaz</p>
+                `;
+                container.appendChild(div);
+            }
+            
+            if (gameState.jokerIleBitiren) {
+                const div = document.createElement('div');
+                div.className = 'mb-4 p-3 bg-orange-100 rounded-lg border border-orange-300';
+                div.innerHTML = `
+                    <p class="text-orange-800 font-medium">🃏 Joker Etkisi Aktif!</p>
+                    <p class="text-sm text-orange-700 mt-1">${gameState.jokerIleBitiren} joker ile bitirdi - Tüm ceza puanları x2 olacak</p>
+                `;
+                container.appendChild(div);
+            }
+            
+            if (!canCalculate()) {
+                const div = document.createElement('div');
+                div.className = 'mb-4 p-3 bg-yellow-100 rounded-lg border border-yellow-300';
+                const missing = [];
+                
+                if (!gameState.selectedPenalty) missing.push('• Oynanan cezayı seçin');
+                if (!gameState.penaltyCaller) missing.push('• Cezayı söyleyen oyuncuyu seçin');
+                if (!gameState.roundWinner) missing.push('• Eli bitiren oyuncuyu seçin');
+                
+                const allPenaltiesFilled = gameState.players.every(player => 
+                    player === gameState.roundWinner ? true : gameState.roundPenalties[player] !== undefined && gameState.roundPenalties[player] !== ''
+                );
+                if (!allPenaltiesFilled) missing.push('• Diğer oyuncuların ceza sayısını girin');
+                
+                div.innerHTML = `
+                    <p class="text-yellow-800 font-medium">Eksik alanlar:</p>
+                    <ul class="text-sm text-yellow-700 mt-2">
+                        ${missing.map(item => `<li>${item}</li>`).join('')}
+                    </ul>
+                `;
+                container.appendChild(div);
+            }
+        }
+
+        function calculateRoundScore() {
+            if (!canCalculate()) return;
+            
+            const scores = getCurrentScores();
+            const roundResults = [];
+            const penalty = penalties.find(p => p.id === parseInt(gameState.selectedPenalty));
+
+            gameState.players.forEach(player => {
+                let originalPenalty = parseInt(gameState.roundPenalties[player]) || 0;
+                let penaltyCount = originalPenalty;
+                
+                // Cezayı söyleyen kişi görevini açamadan başkası bitirirse x2 ceza alır
+                if (player === gameState.cezayıSöyleyenAçamadı && gameState.cezayıSöyleyenAçamadı !== '') {
+                    penaltyCount = originalPenalty * 2;
+                }
+                
+                // Joker ile bitiren varsa tüm oyuncuların ceza puanları 2 katına çıkar (joker atan da dahil)
+                if (gameState.jokerIleBitiren && gameState.jokerIleBitiren !== '') {
+                    // Eğer hem cezayı söyleyen açamadı hem joker etkisi varsa, önce cezayı söyleyen x2, sonra joker x2
+                    if (player === gameState.cezayıSöyleyenAçamadı && gameState.cezayıSöyleyenAçamadı !== '') {
+                        penaltyCount = originalPenalty * 2 * 2; // 4 katı
+                    } else {
+                        penaltyCount = originalPenalty * 2;
+                    }
+                }
+                
+                // Eli bitiren oyuncunun ceza puanı 0 olur (joker ile bitiren de dahil)
+                if (player === gameState.roundWinner) {
+                    penaltyCount = 0;
+                    originalPenalty = 0;
+                }
+                
+                // Bonus hesaplama - SON ELDE (Elden cezası) bonus yok!
+                let bonusPoints = 0;
+                const isLastRound = gameState.selectedPenalty === '13'; // Elden cezası
+                if (player === gameState.roundWinner && player === gameState.penaltyCaller && !isLastRound) {
+                    bonusPoints = 50;
+                }
+                
+                const işlerKağıtCezası = player === gameState.işlerKağıtAtan ? -50 : 0;
+                const totalChange = -penaltyCount + bonusPoints + işlerKağıtCezası;
+                
+                roundResults.push({
+                    player,
+                    penalties: penaltyCount,
+                    originalPenalties: originalPenalty,
+                    bonus: bonusPoints,
+                    işlerKağıtCezası: işlerKağıtCezası,
+                    totalChange: totalChange,
+                    newTotal: scores[player] + totalChange,
+                    isWinner: player === gameState.roundWinner,
+                    gotBonus: bonusPoints > 0,
+                    attıİşlerKağıt: player === gameState.işlerKağıtAtan,
+                    jokerEtkisi: gameState.jokerIleBitiren && gameState.jokerIleBitiren !== '',
+                    cezayıSöyleyenAçamadı: player === gameState.cezayıSöyleyenAçamadı && gameState.cezayıSöyleyenAçamadı !== ''
+                });
+            });
+
+            gameState.gameHistory.push({
+                round: gameState.currentRound,
+                penaltyId: penalty.id,
+                penaltyName: penalty.name,
+                penaltyShort: penalty.short,
+                penaltySymbol: penalty.symbol,
+                penaltyCaller: gameState.penaltyCaller,
+                işlerKağıtAtan: gameState.işlerKağıtAtan,
+                jokerIleBitiren: gameState.jokerIleBitiren,
+                cezayıSöyleyenAçamadı: gameState.cezayıSöyleyenAçamadı,
+                results: roundResults,
+                winner: gameState.roundWinner,
+                time: new Date().toLocaleTimeString('tr-TR')
+            });
+
+            gameState.playedPenalties[penalty.id] = true;
+
+            // Reset for next round
+            gameState.selectedPenalty = '';
+            gameState.penaltyCaller = '';
+            gameState.işlerKağıtAtan = '';
+            gameState.jokerIleBitiren = '';
+            gameState.cezayıSöyleyenAçamadı = '';
+            
+            gameState.roundPenalties = {};
+            gameState.players.forEach(player => {
+                gameState.roundPenalties[player] = '';
+            });
+            gameState.roundWinner = '';
+            gameState.currentRound++;
+            
+            updateGameScreen();
+            updateGameHistory();
+            checkGameOver();
+        }
+
+        function updateGameHistory() {
+            if (gameState.gameHistory.length === 0) return;
+            
+            const section = document.getElementById('gameHistorySection');
+            section.classList.remove('hidden');
+            
+            const thead = document.getElementById('gameHistoryTableHead');
+            const tbody = document.getElementById('gameHistoryTableBody');
+            
+            // Create header
+            thead.innerHTML = `
+                <tr class="bg-purple-600 text-white">
+                    <th class="border p-3 font-bold">El</th>
+                    <th class="border p-3 font-bold">Ceza / Söyleyen</th>
+                    ${gameState.players.map(player => `<th class="border p-3 font-bold">${player}</th>`).join('')}
+                </tr>
+            `;
+            
+            // Create body
+            tbody.innerHTML = '';
+            gameState.gameHistory.forEach((round, index) => {
+                const tr = document.createElement('tr');
+                tr.className = index % 2 === 0 ? 'bg-gray-50' : 'bg-white';
+                
+                tr.innerHTML = `
+                    <td class="border p-3 text-center">
+                        <div class="font-bold text-lg text-purple-600">${round.round}</div>
+                        <div class="text-xs text-gray-500">El</div>
+                    </td>
+                    <td class="border p-3 font-medium text-center">
+                        <div class="font-bold">${round.penaltySymbol}</div>
+                        <div class="text-xs text-gray-600">${round.penaltyName}</div>
+                        <div class="text-xs text-blue-600 font-medium mt-1">👤 ${round.penaltyCaller}</div>
+                        ${round.işlerKağıtAtan ? `<div class="text-xs text-red-600 font-medium">⚠️ ${round.işlerKağıtAtan}</div>` : ''}
+                        ${round.jokerIleBitiren ? `<div class="text-xs text-orange-600 font-medium">🃏 ${round.jokerIleBitiren}</div>` : ''}
+                        ${round.cezayıSöyleyenAçamadı ? `<div class="text-xs text-purple-600 font-medium">💜 ${round.cezayıSöyleyenAçamadı}</div>` : ''}
+                    </td>
+                    ${gameState.players.map(player => {
+                        const result = round.results.find(r => r.player === player);
+                        return `
+                            <td class="border p-3 text-center">
+                                <div class="font-bold text-lg ${result?.newTotal >= 0 ? 'text-green-600' : 'text-red-600'}">
+                                    ${result?.newTotal || 0}
+                                </div>
+                                <div class="text-xs text-gray-500">
+                                    (${result?.totalChange > 0 ? '+' : ''}${result?.totalChange || 0})
+                                    ${result?.gotBonus ? '🏆' : ''}
+                                    ${result?.isWinner && !result?.gotBonus ? '🏁' : ''}
+                                    ${result?.attıİşlerKağıt ? '⚠️' : ''}
+                                    ${result?.jokerEtkisi ? '🃏' : ''}
+                                    ${result?.cezayıSöyleyenAçamadı ? '💜' : ''}
+                                </div>
+                            </td>
+                        `;
+                    }).join('')}
+                `;
+                
+                tbody.appendChild(tr);
+            });
+        }
+
+        function checkGameOver() {
+            const remaining = getRemainingPenalties();
+            if (remaining.length === 0) {
+                const leader = getLeader();
+                const scores = getCurrentScores();
+                
+                document.getElementById('roundInputSection').classList.add('hidden');
+                document.getElementById('gameOverSection').classList.remove('hidden');
+                document.getElementById('gameOverText').textContent = `Tüm cezalar oynandı. Kazanan: ${leader} (${scores[leader]} puan)`;
+            }
+        }
+
+        function resetGame() {
+            gameState.currentRound = 1;
+            gameState.selectedPenalty = '';
+            gameState.penaltyCaller = '';
+            gameState.işlerKağıtAtan = '';
+            gameState.jokerIleBitiren = '';
+            gameState.cezayıSöyleyenAçamadı = '';
+            
+            gameState.roundPenalties = {};
+            gameState.players.forEach(player => {
+                gameState.roundPenalties[player] = '';
+            });
+            gameState.roundWinner = '';
+            gameState.gameHistory = [];
+            gameState.playedPenalties = {};
+            
+            document.getElementById('roundInputSection').classList.remove('hidden');
+            document.getElementById('gameOverSection').classList.add('hidden');
+            document.getElementById('gameHistorySection').classList.add('hidden');
+            
+            if (gameState.gameStarted) {
+                updateGameScreen();
+            }
+        }
+
+        function showRules() {
+            document.getElementById('rulesModal').classList.remove('hidden');
+        }
+
+        function closeRules() {
+            document.getElementById('rulesModal').classList.add('hidden');
+        }
+
+        // Initialize app when page loads
+        document.addEventListener('DOMContentLoaded', initApp);
+    </script>
+</body>
+</html>
