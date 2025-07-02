@@ -19,6 +19,45 @@
             to { opacity: 1; }
         }
         
+        /* Language Toggle Styles */
+        .language-toggle {
+            position: relative;
+            display: inline-flex;
+            align-items: center;
+            background: #f3f4f6;
+            border-radius: 12px;
+            padding: 4px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+        }
+        
+        .language-toggle.dark {
+            background: #374151;
+        }
+        
+        .language-option {
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.3s ease;
+            position: relative;
+            z-index: 2;
+        }
+        
+        .language-option.active {
+            background: #3b82f6;
+            color: white;
+            box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+        }
+        
+        .language-option.inactive {
+            color: #6b7280;
+        }
+        
+        .language-option.inactive.dark {
+            color: #9ca3af;
+        }
+        
         /* Mobil için özel input styling */
         @media (max-width: 768px) {
             /* Tüm grid'leri mobilde tek kolona zorla */
@@ -70,14 +109,21 @@
                 <div class="text-center mb-8">
                     <div class="flex items-center justify-center gap-3 mb-4">
                         <div class="w-8 h-8 text-purple-600 flex items-center justify-center">⚙️</div>
-                        <h1 class="text-3xl font-bold text-gray-800">🃏 Americano Oyun Kurulumu</h1>
+                        <h1 id="setupTitle" class="text-3xl font-bold text-gray-800">🃏 Americano Oyun Kurulumu</h1>
+                        <!-- Language Toggle -->
+                        <div class="ml-4">
+                            <div id="languageToggle" class="language-toggle" onclick="toggleLanguage()">
+                                <div id="langTr" class="language-option active">TR</div>
+                                <div id="langEn" class="language-option inactive">EN</div>
+                            </div>
+                        </div>
                     </div>
-                    <p class="text-gray-600">Oyuncu sayısı ve isimlerini ayarlayın</p>
+                    <p id="setupSubtitle" class="text-gray-600">Oyuncu sayısı ve isimlerini ayarlayın</p>
                 </div>
 
                 <!-- Player Count Section -->
                 <div class="rounded-xl p-6 mb-6 bg-blue-50">
-                    <h3 class="font-bold text-lg mb-4 text-center text-gray-800">Oyuncu Sayısı</h3>
+                    <h3 id="playerCountTitle" class="font-bold text-lg mb-4 text-center text-gray-800">Oyuncu Sayısı</h3>
                     <div class="flex items-center justify-center gap-4">
                         <button id="removePlayerBtn" class="p-3 rounded-lg font-bold transition-all bg-gray-300 text-gray-500 cursor-not-allowed">
                             ➖
@@ -89,12 +135,12 @@
                             ➕
                         </button>
                     </div>
-                    <p class="text-center mt-2 text-gray-600">3-5 oyuncu</p>
+                    <p id="playerCountDesc" class="text-center mt-2 text-gray-600">3-5 oyuncu</p>
                 </div>
 
                 <!-- Player Names Section -->
                 <div class="rounded-xl p-6 mb-6 bg-yellow-50">
-                    <h3 class="font-bold text-lg mb-4 text-center text-gray-800">Oyuncu İsimleri</h3>
+                    <h3 id="playerNamesTitle" class="font-bold text-lg mb-4 text-center text-gray-800">Oyuncu İsimleri</h3>
                     <div id="playerInputs" class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                         <!-- Player inputs will be dynamically generated -->
                     </div>
@@ -102,18 +148,18 @@
 
                 <!-- Game Stake Section -->
                 <div class="rounded-xl p-6 mb-6 bg-orange-50">
-                    <h3 class="font-bold text-lg mb-4 text-center text-gray-800">Bu Oyun Neye Oynanıyor?</h3>
+                    <h3 id="gameStakeTitle" class="font-bold text-lg mb-4 text-center text-gray-800">Bu Oyun Neye Oynanıyor?</h3>
                     <div class="mb-4">
                         <input type="text" id="gameStakeInput" class="w-full p-4 md:p-4 text-lg md:text-xl min-h-[60px] md:min-h-[50px] border border-gray-300 rounded-lg text-center font-medium"
                                placeholder="Örnek: Kahve ısmarlama, Yemek ısmarlama..." style="font-size: 18px !important; padding: 16px !important;" />
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
-                        <button onclick="setStake('Kahve ısmarlama')" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">☕ Kahve</button>
-                        <button onclick="setStake('Yemek ısmarlama')" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">🍕 Yemek</button>
-                        <button onclick="setStake('Dondurma ısmarlama')" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">🍦 Dondurma</button>
-                        <button onclick="setStake('Sadece eğlence')" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">🎉 Eğlence</button>
-                        <button onclick="setStake('💰 Para')" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">💰 Para</button>
-                        <button onclick="setCustomStake()" class="p-2 rounded-lg text-sm bg-blue-100 hover:bg-blue-200 text-blue-800 transition-colors">✏️ Özel</button>
+                        <button onclick="setStake('coffee')" id="coffeeBtn" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">☕ Kahve</button>
+                        <button onclick="setStake('food')" id="foodBtn" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">🍕 Yemek</button>
+                        <button onclick="setStake('icecream')" id="icecreamBtn" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">🍦 Dondurma</button>
+                        <button onclick="setStake('fun')" id="funBtn" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">🎉 Eğlence</button>
+                        <button onclick="setStake('money')" id="moneyBtn" class="p-2 rounded-lg text-sm bg-white hover:bg-gray-50 text-black transition-colors">💰 Para</button>
+                        <button onclick="setCustomStake()" id="customBtn" class="p-2 rounded-lg text-sm bg-blue-100 hover:bg-blue-200 text-blue-800 transition-colors">✏️ Özel</button>
                     </div>
                 </div>
 
@@ -124,14 +170,14 @@
                     </button>
                     <div id="startGameError" class="text-red-500 mt-2 text-sm hidden">Lütfen tüm oyuncu isimlerini doldurun</div>
                     <div id="gameStakeDisplay" class="mt-3 p-2 bg-orange-100 rounded-lg hidden">
-                        <p class="text-orange-800 text-sm">🏆 Bu oyun: <strong id="gameStakeText"></strong></p>
+                        <p class="text-orange-800 text-sm">🏆 <span id="thisGameLabel">Bu oyun</span>: <strong id="gameStakeText"></strong></p>
                     </div>
                 </div>
 
                 <!-- Rules Section -->
                 <div class="bg-green-50 rounded-xl p-6 mt-6">
-                    <h3 class="font-bold text-lg text-gray-800 mb-3">Oyun Kuralları:</h3>
-                    <ul class="space-y-2 text-gray-700">
+                    <h3 id="gameRulesTitle" class="font-bold text-lg text-gray-800 mb-3">Oyun Kuralları:</h3>
+                    <ul id="gameRulesList" class="space-y-2 text-gray-700">
                         <li>• <strong>3, 4 veya 5 oyuncuyla</strong> oynanır</li>
                         <li>• <strong>13 farklı ceza</strong> türü vardır</li>
                         <li>• <strong>"Elden" cezası</strong> mecburen son elde (13. el) oynanır</li>
@@ -160,13 +206,20 @@
                     <button id="darkModeBtn" onclick="toggleDarkMode()" class="ml-2 p-2 rounded-lg transition-all bg-gray-200 text-gray-700 hover:bg-gray-300" title="Gece modu">
                         🌙
                     </button>
+                    <!-- Language Toggle in Game -->
+                    <div class="ml-2">
+                        <div id="languageToggleGame" class="language-toggle" onclick="toggleLanguage()">
+                            <div id="langTrGame" class="language-option active">TR</div>
+                            <div id="langEnGame" class="language-option inactive">EN</div>
+                        </div>
+                    </div>
                 </div>
                 <p id="playersDisplay" class="text-gray-600"></p>
                 <div class="mt-2 text-lg font-semibold text-purple-600">
-                    El <span id="currentRoundDisplay">1</span> - <span id="remainingPenaltiesDisplay">13</span>/13 ceza kaldı
+                    <span id="roundLabel">El</span> <span id="currentRoundDisplay">1</span> - <span id="remainingPenaltiesDisplay">13</span>/13 <span id="penaltiesLeftLabel">ceza kaldı</span>
                 </div>
                 <div id="gameStakeGameDisplay" class="mt-2 text-sm text-orange-600 hidden">
-                    🏆 Bu oyun: <strong id="gameStakeGameText"></strong>
+                    🏆 <span id="thisGameLabelGame">Bu oyun</span>: <strong id="gameStakeGameText"></strong>
                 </div>
             </div>
 
@@ -185,21 +238,21 @@
 
             <!-- Round Input Section -->
             <div id="roundInputSection" class="bg-blue-50 rounded-xl p-6 mb-6">
-                <h3 class="font-bold text-lg text-gray-800 mb-4">El <span id="roundInputTitle">1</span> - Puan Girişi</h3>
+                <h3 class="font-bold text-lg text-gray-800 mb-4"><span id="roundInputLabel">El</span> <span id="roundInputTitle">1</span> - <span id="scoreInputLabel">Puan Girişi</span></h3>
                 
                 <!-- Penalty and Caller Selection -->
                 <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-6">
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Bu Elde Oynanan Ceza:</label>
+                        <label id="penaltyPlayedLabel" class="block text-sm font-medium text-gray-700 mb-2">Bu Elde Oynanan Ceza:</label>
                         <select id="selectedPenalty" class="w-full p-4 md:p-3 text-lg md:text-lg min-h-[60px] md:min-h-[50px] border border-gray-300 rounded-lg font-medium" style="font-size: 18px !important; padding: 16px !important;">
-                            <option value="">Ceza seçin...</option>
+                            <option value="" id="selectPenaltyOption">Ceza seçin...</option>
                         </select>
                     </div>
                     
                     <div>
-                        <label class="block text-sm font-medium text-gray-700 mb-2">Cezayı Söyleyen Oyuncu:</label>
+                        <label id="penaltyCallerLabel" class="block text-sm font-medium text-gray-700 mb-2">Cezayı Söyleyen Oyuncu:</label>
                         <select id="penaltyCaller" class="w-full p-4 md:p-3 text-lg md:text-lg min-h-[60px] md:min-h-[50px] border border-gray-300 rounded-lg font-medium" style="font-size: 18px !important; padding: 16px !important;">
-                            <option value="">Oyuncu seçin...</option>
+                            <option value="" id="selectPlayerOption">Oyuncu seçin...</option>
                         </select>
                     </div>
                 </div>
@@ -216,14 +269,14 @@
                     </div>
                     
                     <button id="calculateBtn" onclick="calculateRoundScore()" class="px-8 py-3 rounded-lg font-bold text-white transition-all bg-gray-400 cursor-not-allowed">
-                        Tüm Alanları Doldurun
+                        <span id="calculateBtnText">Tüm Alanları Doldurun</span>
                     </button>
                 </div>
             </div>
 
             <!-- Game Over -->
             <div id="gameOverSection" class="bg-gradient-to-r from-green-400 to-blue-500 text-white p-6 rounded-xl mb-6 text-center hidden">
-                <h2 class="text-2xl font-bold mb-2">🎉 OYUN BİTTİ! 🎉</h2>
+                <h2 id="gameOverTitle" class="text-2xl font-bold mb-2">🎉 OYUN BİTTİ! 🎉</h2>
                 <p id="gameOverText" class="text-lg"></p>
             </div>
 
@@ -231,7 +284,7 @@
             <div id="gameHistorySection" class="bg-gray-50 rounded-xl p-6 mb-6 hidden">
                 <h3 class="font-bold text-lg text-gray-800 mb-4 flex items-center gap-2">
                     <div class="w-5 h-5 flex items-center justify-center">📊</div>
-                    Kümülatif Puan Tablosu
+                    <span id="scoreTableTitle">Kümülatif Puan Tablosu</span>
                 </h3>
                 <div class="overflow-x-auto">
                     <table id="gameHistoryTable" class="w-full border-collapse bg-white rounded-lg overflow-hidden shadow">
@@ -248,7 +301,7 @@
             <!-- Remaining Penalties -->
             <div class="bg-yellow-50 rounded-xl p-6 mb-6">
                 <h3 class="font-bold text-lg text-gray-800 mb-4 text-center">
-                    Kalan Cezalar - <span id="remainingCount">13</span>/13
+                    <span id="remainingPenaltiesTitle">Kalan Cezalar</span> - <span id="remainingCount">13</span>/13
                 </h3>
                 <div id="remainingPenalties" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
                     <!-- Remaining penalties will be dynamically generated -->
@@ -257,79 +310,20 @@
 
             <!-- Control Buttons -->
             <div class="flex gap-4 justify-center flex-wrap">
-                <button onclick="showGameHistory()" class="font-bold py-3 px-6 rounded-lg transition-all bg-green-500 hover:bg-green-600 text-white">
-                    📊 Geçmiş Oyunlar
+                <button onclick="showGameHistory()" id="historyBtn" class="font-bold py-3 px-6 rounded-lg transition-all bg-green-500 hover:bg-green-600 text-white">
+                    📊 <span id="historyBtnText">Geçmiş Oyunlar</span>
                 </button>
-                <button onclick="showRules()" class="font-bold py-3 px-6 rounded-lg transition-all bg-blue-500 hover:bg-blue-600 text-white">
-                    📖 Kuralları Oku
+                <button onclick="showRules()" id="rulesBtn" class="font-bold py-3 px-6 rounded-lg transition-all bg-blue-500 hover:bg-blue-600 text-white">
+                    📖 <span id="rulesBtnText">Kuralları Oku</span>
                 </button>
-                <button onclick="backToSetup()" class="font-bold py-3 px-6 rounded-lg transition-all hover:scale-105 flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white">
+                <button onclick="backToSetup()" id="settingsBtn" class="font-bold py-3 px-6 rounded-lg transition-all hover:scale-105 flex items-center gap-2 bg-blue-500 hover:bg-blue-600 text-white">
                     <div class="w-5 h-5 flex items-center justify-center">⚙️</div>
-                    Oyuncu Ayarları
+                    <span id="settingsBtnText">Oyuncu Ayarları</span>
                 </button>
-                <button onclick="resetGame()" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg transition-all hover:scale-105 flex items-center gap-2">
+                <button onclick="resetGame()" id="newGameBtn" class="bg-red-500 hover:bg-red-600 text-white font-bold py-3 px-6 rounded-lg transition-all hover:scale-105 flex items-center gap-2">
                     <div class="w-5 h-5 flex items-center justify-center">🔄</div>
-                    Yeni Oyun Başlat
+                    <span id="newGameBtnText">Yeni Oyun Başlat</span>
                 </button>
-            </div>
-        </div>
-
-        <!-- Custom Penalty Modal -->
-        <div id="customPenaltyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
-            <div class="max-w-md w-full rounded-2xl shadow-2xl bg-white">
-                <div class="p-6 border-b bg-white border-gray-200">
-                    <div class="flex justify-between items-center">
-                        <h2 class="text-2xl font-bold text-gray-800">⚡ Yeni Özel Ceza</h2>
-                        <button onclick="closeCustomPenaltyModal()" class="p-2 rounded-lg transition-all bg-gray-100 hover:bg-gray-200 text-gray-700">
-                            ✕
-                        </button>
-                    </div>
-                </div>
-                
-                <div class="p-6">
-                    <form id="customPenaltyForm" onsubmit="saveCustomPenalty(event)">
-                        <div class="space-y-4">
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Ceza Adı:</label>
-                                <input type="text" id="customPenaltyName" required 
-                                       class="w-full p-3 border border-gray-300 rounded-lg font-medium"
-                                       placeholder="Örnek: 6'lı Seri" />
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Kısa Ad:</label>
-                                <input type="text" id="customPenaltyShort" required maxlength="6"
-                                       class="w-full p-3 border border-gray-300 rounded-lg font-medium"
-                                       placeholder="Örnek: 6S" />
-                            </div>
-                            
-                            <div>
-                                <label class="block text-sm font-medium text-gray-700 mb-2">Sembol:</label>
-                                <input type="text" id="customPenaltySymbol" readonly
-                                       class="w-full p-3 border border-gray-300 rounded-lg font-medium bg-gray-100"
-                                       placeholder="Otomatik oluşturulacak" />
-                            </div>
-                            
-                            <div class="bg-blue-50 p-4 rounded-lg">
-                                <p class="text-sm text-blue-700">
-                                    <strong>Not:</strong> Eklediğiniz özel ceza, normal cezalar gibi oyunda kullanılabilecek.
-                                    Sembol otomatik olarak oluşturulacak.
-                                </p>
-                            </div>
-                        </div>
-                        
-                        <div class="flex gap-3 mt-6">
-                            <button type="button" onclick="closeCustomPenaltyModal()" 
-                                    class="flex-1 py-3 px-4 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-all">
-                                İptal
-                            </button>
-                            <button type="submit" 
-                                    class="flex-1 py-3 px-4 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-all">
-                                Ceza Ekle
-                            </button>
-                        </div>
-                    </form>
-                </div>
             </div>
         </div>
 
@@ -338,7 +332,7 @@
             <div class="max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white">
                 <div class="sticky top-0 p-6 border-b bg-white border-gray-200">
                     <div class="flex justify-between items-center">
-                        <h2 class="text-2xl font-bold text-gray-800">📊 Geçmiş Oyunlar</h2>
+                        <h2 id="gameHistoryModalTitle" class="text-2xl font-bold text-gray-800">📊 Geçmiş Oyunlar</h2>
                         <button onclick="closeGameHistoryModal()" class="p-2 rounded-lg transition-all bg-gray-100 hover:bg-gray-200 text-gray-700">
                             ✕
                         </button>
@@ -358,7 +352,7 @@
             <div class="max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white">
                 <div class="sticky top-0 p-6 border-b bg-white border-gray-200">
                     <div class="flex justify-between items-center">
-                        <h2 class="text-2xl font-bold text-gray-800">🎮 Oyun Detayları</h2>
+                        <h2 id="gameDetailModalTitle" class="text-2xl font-bold text-gray-800">🎮 Oyun Detayları</h2>
                         <button onclick="closeGameDetailModal()" class="p-2 rounded-lg transition-all bg-gray-100 hover:bg-gray-200 text-gray-700">
                             ✕
                         </button>
@@ -375,11 +369,232 @@
     </div>
 
     <script>
+        // Translations object
+        const translations = {
+            tr: {
+                // Setup Screen
+                gameSetupTitle: '🃏 Americano Oyun Kurulumu',
+                gameSetupSubtitle: 'Oyuncu sayısı ve isimlerini ayarlayın',
+                playerCount: 'Oyuncu Sayısı',
+                playerCountDesc: '3-5 oyuncu',
+                playerNames: 'Oyuncu İsimleri',
+                gameStakeTitle: 'Bu Oyun Neye Oynanıyor?',
+                gameStakePlaceholder: 'Örnek: Kahve ısmarlama, Yemek ısmarlama...',
+                startGame: '🎯 Oyunu Başlat',
+                fillAllFields: 'Lütfen tüm oyuncu isimlerini doldurun',
+                thisGame: 'Bu oyun',
+                gameRules: 'Oyun Kuralları:',
+                
+                // Game Screen
+                round: 'El',
+                penaltiesLeft: 'ceza kaldı',
+                leader: 'Lider',
+                totalScore: 'toplam puan',
+                scoreInput: 'Puan Girişi',
+                penaltyPlayed: 'Bu Elde Oynanan Ceza:',
+                selectPenalty: 'Ceza seçin...',
+                penaltyCaller: 'Cezayı Söyleyen Oyuncu:',
+                selectPlayer: 'Oyuncu seçin...',
+                thisRoundPenalty: 'Bu Elde Ceza Sayısı',
+                finishedRound: 'Eli Bitirdi',
+                finishedWithJoker: 'Joker İle Bitirdi',
+                threwUselessCard: 'İşler Kağıt Attı',
+                failedToComplete: 'Görevini Açamadı',
+                onlyForCaller: 'Sadece Ceza Söyleyen İçin',
+                calculateRound: 'Eli Kaydet ve Sonrakine Geç',
+                fillAllRequiredFields: 'Tüm Alanları Doldurun',
+                
+                // Game Over
+                gameOver: 'OYUN BİTTİ!',
+                allPenaltiesPlayed: 'Tüm cezalar oynandı. Kazanan:',
+                
+                // Buttons
+                gameHistory: 'Geçmiş Oyunlar',
+                readRules: 'Kuralları Oku',
+                playerSettings: 'Oyuncu Ayarları',
+                newGame: 'Yeni Oyun Başlat',
+                
+                // Stakes
+                coffee: 'Kahve ısmarlama',
+                food: 'Yemek ısmarlama',
+                icecream: 'Dondurma ısmarlama',
+                fun: 'Sadece eğlence',
+                money: 'Para',
+                custom: 'Özel',
+                
+                // Penalties (Turkish names)
+                penalties: {
+                    "3S": "3'lü Seri",
+                    "3K": "3'lü Küt", 
+                    "3S3K": "3'lü Seri + 3'lü Küt",
+                    "23S": "2 3'lü Seri",
+                    "23K": "2 3'lü Küt",
+                    "4S": "4'lü Seri",
+                    "4K": "4'lü Küt",
+                    "4S4K": "4 Seri 4 Küt",
+                    "24S": "2 4'lü Seri",
+                    "24K": "2 4'lü Küt",
+                    "5S": "5'li Seri",
+                    "Ç": "Çift",
+                    "E": "Elden"
+                },
+                
+                // Modal titles
+                gameHistoryModalTitle: '📊 Geçmiş Oyunlar',
+                gameDetailModalTitle: '🎮 Oyun Detayları',
+                
+                // Table headers
+                round: 'El',
+                penalty: 'Ceza',
+                caller: 'Söyleyen',
+                winner: 'Bitiren',
+                
+                // Messages
+                noGameHistory: 'Henüz oyun geçmişi yok',
+                completeFirstGame: 'İlk oyununuzu tamamlayın ve burada görün',
+                remainingPenalties: 'Kalan Cezalar',
+                scoreTable: 'Kümülatif Puan Tablosu',
+                
+                // Status messages
+                bonusPoints: '+50 bonus puan (Söyledi ve Bitirdi)',
+                noLastRoundBonus: 'Son elde bonus yok (Elden kuralı)',
+                jokerEffect: '🃏 Joker etkisi: Herkese x2 ceza puanı',
+                uselessCardPenalty: '-50 ceza puanı (İşler kağıt)',
+                failedCallerPenalty: 'x2 ceza puanı (Görevini açamadı)',
+                
+                // Player labels
+                player: 'Oyuncu',
+                points: 'puan',
+                
+                // Warning messages
+                callerFailedWarning: 'Cezayı Söyleyen Görevini Açamadı!',
+                callerFailedDesc: 'cezayı söyledi ama görevini açamadı - x2 ceza puanı alacak',
+                lastRoundRule: 'Son El (Elden) Kuralı',
+                lastRoundRuleDesc: 'Bu elde cezayı söyleyip bitiren oyuncu +50 bonus alamaz',
+                jokerEffectActive: 'Joker Etkisi Aktif!',
+                jokerEffectDesc: 'joker ile bitirdi - Tüm ceza puanları x2 olacak',
+                missingFields: 'Eksik alanlar:',
+                selectPlayedPenalty: '• Oynanan cezayı seçin',
+                selectPenaltyCaller: '• Cezayı söyleyen oyuncuyu seçin',
+                selectRoundWinner: '• Eli bitiren oyuncuyu seçin',
+                enterOtherPenalties: '• Diğer oyuncuların ceza sayısını girin'
+            },
+            en: {
+                // Setup Screen
+                gameSetupTitle: '🃏 Americano Game Setup',
+                gameSetupSubtitle: 'Set player count and names',
+                playerCount: 'Player Count',
+                playerCountDesc: '3-5 players',
+                playerNames: 'Player Names',
+                gameStakeTitle: 'What is this game for?',
+                gameStakePlaceholder: 'Example: Coffee treat, Dinner treat...',
+                startGame: '🎯 Start Game',
+                fillAllFields: 'Please fill in all player names',
+                thisGame: 'This game',
+                gameRules: 'Game Rules:',
+                
+                // Game Screen
+                round: 'Round',
+                penaltiesLeft: 'penalties left',
+                leader: 'Leader',
+                totalScore: 'total score',
+                scoreInput: 'Score Input',
+                penaltyPlayed: 'Penalty Played This Round:',
+                selectPenalty: 'Select penalty...',
+                penaltyCaller: 'Player Who Called Penalty:',
+                selectPlayer: 'Select player...',
+                thisRoundPenalty: 'Penalty Count This Round',
+                finishedRound: 'Finished Round',
+                finishedWithJoker: 'Finished With Joker',
+                threwUselessCard: 'Threw Useless Card',
+                failedToComplete: 'Failed to Complete',
+                onlyForCaller: 'Only for Penalty Caller',
+                calculateRound: 'Save Round and Continue',
+                fillAllRequiredFields: 'Fill All Required Fields',
+                
+                // Game Over
+                gameOver: 'GAME OVER!',
+                allPenaltiesPlayed: 'All penalties played. Winner:',
+                
+                // Buttons
+                gameHistory: 'Game History',
+                readRules: 'Read Rules',
+                playerSettings: 'Player Settings',
+                newGame: 'Start New Game',
+                
+                // Stakes
+                coffee: 'Coffee treat',
+                food: 'Food treat',
+                icecream: 'Ice cream treat',
+                fun: 'Just for fun',
+                money: 'Money',
+                custom: 'Custom',
+                
+                // Penalties (English names)
+                penalties: {
+                    "3S": "3-Card Sequence",
+                    "3K": "3-Card Set",
+                    "3S3K": "3-Card Sequence + 3-Card Set",
+                    "23S": "2 3-Card Sequences",
+                    "23K": "2 3-Card Sets",
+                    "4S": "4-Card Sequence",
+                    "4K": "4-Card Set",
+                    "4S4K": "4-Card Sequence + 4-Card Set",
+                    "24S": "2 4-Card Sequences",
+                    "24K": "2 4-Card Sets",
+                    "5S": "5-Card Sequence",
+                    "Ç": "Pair",
+                    "E": "Going Out"
+                },
+                
+                // Modal titles
+                gameHistoryModalTitle: '📊 Game History',
+                gameDetailModalTitle: '🎮 Game Details',
+                
+                // Table headers
+                round: 'Round',
+                penalty: 'Penalty',
+                caller: 'Caller',
+                winner: 'Winner',
+                
+                // Messages
+                noGameHistory: 'No game history yet',
+                completeFirstGame: 'Complete your first game to see it here',
+                remainingPenalties: 'Remaining Penalties',
+                scoreTable: 'Cumulative Score Table',
+                
+                // Status messages
+                bonusPoints: '+50 bonus points (Called and Finished)',
+                noLastRoundBonus: 'No bonus in last round (Going Out rule)',
+                jokerEffect: '🃏 Joker effect: x2 penalty points for everyone',
+                uselessCardPenalty: '-50 penalty points (Useless card)',
+                failedCallerPenalty: 'x2 penalty points (Failed to complete)',
+                
+                // Player labels
+                player: 'Player',
+                points: 'points',
+                
+                // Warning messages
+                callerFailedWarning: 'Penalty Caller Failed to Complete!',
+                callerFailedDesc: 'called the penalty but failed to complete - will get x2 penalty points',
+                lastRoundRule: 'Last Round (Going Out) Rule',
+                lastRoundRuleDesc: 'Player who calls and finishes this round cannot get +50 bonus',
+                jokerEffectActive: 'Joker Effect Active!',
+                jokerEffectDesc: 'finished with joker - All penalty points will be x2',
+                missingFields: 'Missing fields:',
+                selectPlayedPenalty: '• Select the played penalty',
+                selectPenaltyCaller: '• Select the penalty caller',
+                selectRoundWinner: '• Select the round winner',
+                enterOtherPenalties: '• Enter other players\' penalty counts'
+            }
+        };
+
         // Game state variables
         let gameState = {
+            language: 'tr', // Default language
             gameStarted: false,
             playerCount: 3,
-            players: ['', '', ''],
+            players: ['', '', ''], // Boş stringler ile başlat
             darkMode: false,
             gameStake: '',
             currentRound: 1,
@@ -392,39 +607,204 @@
             cezayıSöyleyenAçamadı: '',
             gameHistory: [],
             playedPenalties: {},
-            customPenalties: [], // Kullanıcı tanımlı cezalar
+            customPenalties: [],
             gameStartDate: null
         };
 
         let defaultPenalties = [
-            { id: 1, name: "3'lü Seri", short: "3S", symbol: "①", isCustom: false },
-            { id: 2, name: "3'lü Küt", short: "3K", symbol: "②", isCustom: false },
-            { id: 3, name: "3'lü Seri + 3'lü Küt", short: "3S3K", symbol: "③", isCustom: false },
-            { id: 4, name: "2 3'lü Seri", short: "23S", symbol: "④", isCustom: false },
-            { id: 5, name: "2 3'lü Küt", short: "23K", symbol: "⑤", isCustom: false },
-            { id: 6, name: "4'lü Seri", short: "4S", symbol: "⑥", isCustom: false },
-            { id: 7, name: "4'lü Küt", short: "4K", symbol: "⑦", isCustom: false },
-            { id: 8, name: "4 Seri 4 Küt", short: "4S4K", symbol: "⑧", isCustom: false },
-            { id: 9, name: "2 4'lü Seri", short: "24S", symbol: "⑨", isCustom: false },
-            { id: 10, name: "2 4'lü Küt", short: "24K", symbol: "⑩", isCustom: false },
-            { id: 11, name: "5'li Seri", short: "5S", symbol: "⑪", isCustom: false },
-            { id: 12, name: "Çift", short: "Ç", symbol: "⑫", isCustom: false },
-            { id: 13, name: "Elden", short: "E", symbol: "⑬", isCustom: false }
+            { id: 1, name: "3S", short: "3S", symbol: "①", isCustom: false },
+            { id: 2, name: "3K", short: "3K", symbol: "②", isCustom: false },
+            { id: 3, name: "3S3K", short: "3S3K", symbol: "③", isCustom: false },
+            { id: 4, name: "23S", short: "23S", symbol: "④", isCustom: false },
+            { id: 5, name: "23K", short: "23K", symbol: "⑤", isCustom: false },
+            { id: 6, name: "4S", short: "4S", symbol: "⑥", isCustom: false },
+            { id: 7, name: "4K", short: "4K", symbol: "⑦", isCustom: false },
+            { id: 8, name: "4S4K", short: "4S4K", symbol: "⑧", isCustom: false },
+            { id: 9, name: "24S", short: "24S", symbol: "⑨", isCustom: false },
+            { id: 10, name: "24K", short: "24K", symbol: "⑩", isCustom: false },
+            { id: 11, name: "5S", short: "5S", symbol: "⑪", isCustom: false },
+            { id: 12, name: "Ç", short: "Ç", symbol: "⑫", isCustom: false },
+            { id: 13, name: "E", short: "E", symbol: "⑬", isCustom: false }
         ];
+
+        // Translation helper function
+        function t(key, fallback = key) {
+            const keys = key.split('.');
+            let value = translations[gameState.language];
+            
+            for (const k of keys) {
+                if (value && value[k] !== undefined) {
+                    value = value[k];
+                } else {
+                    return fallback || key;
+                }
+            }
+            
+            return value || fallback || key;
+        }
+
+        // Language toggle function
+        function toggleLanguage() {
+            gameState.language = gameState.language === 'tr' ? 'en' : 'tr';
+            updateLanguageToggle();
+            updateAllTexts();
+            
+            // Save language preference
+            try {
+                localStorage.setItem('americano_language', gameState.language);
+            } catch (error) {
+                console.error('Error saving language preference:', error);
+            }
+        }
+
+        function updateLanguageToggle() {
+            // Update both toggles (setup and game)
+            const toggles = ['languageToggle', 'languageToggleGame'];
+            const trElements = ['langTr', 'langTrGame'];
+            const enElements = ['langEn', 'langEnGame'];
+            
+            toggles.forEach((toggleId, index) => {
+                const toggle = document.getElementById(toggleId);
+                const trElement = document.getElementById(trElements[index]);
+                const enElement = document.getElementById(enElements[index]);
+                
+                if (toggle && trElement && enElement) {
+                    if (gameState.language === 'tr') {
+                        trElement.className = 'language-option active';
+                        enElement.className = `language-option inactive ${gameState.darkMode ? 'dark' : ''}`;
+                    } else {
+                        trElement.className = `language-option inactive ${gameState.darkMode ? 'dark' : ''}`;
+                        enElement.className = 'language-option active';
+                    }
+                    
+                    // Update toggle background for dark mode
+                    if (gameState.darkMode) {
+                        toggle.classList.add('dark');
+                    } else {
+                        toggle.classList.remove('dark');
+                    }
+                }
+            });
+        }
+
+        function updateAllTexts() {
+            // Update setup screen texts
+            document.getElementById('setupTitle').textContent = t('gameSetupTitle');
+            document.getElementById('setupSubtitle').textContent = t('gameSetupSubtitle');
+            document.getElementById('playerCountTitle').textContent = t('playerCount');
+            document.getElementById('playerCountDesc').textContent = t('playerCountDesc');
+            document.getElementById('playerNamesTitle').textContent = t('playerNames');
+            document.getElementById('gameStakeTitle').textContent = t('gameStakeTitle');
+            document.getElementById('gameStakeInput').placeholder = t('gameStakePlaceholder');
+            document.getElementById('startGameBtn').innerHTML = t('startGame');
+            document.getElementById('startGameError').textContent = t('fillAllFields');
+            document.getElementById('thisGameLabel').textContent = t('thisGame');
+            
+            // Update stake buttons
+            document.getElementById('coffeeBtn').innerHTML = `☕ ${t('coffee').split(' ')[0]}`;
+            document.getElementById('foodBtn').innerHTML = `🍕 ${t('food').split(' ')[0]}`;
+            document.getElementById('icecreamBtn').innerHTML = `🍦 ${t('icecream').split(' ')[0]}`;
+            document.getElementById('funBtn').innerHTML = `🎉 ${t('fun').split(' ')[0] === 'Sadece' ? 'Eğlence' : 'Fun'}`;
+            document.getElementById('moneyBtn').innerHTML = `💰 ${t('money')}`;
+            document.getElementById('customBtn').innerHTML = `✏️ ${t('custom')}`;
+            
+            // Update game screen texts
+            document.getElementById('roundLabel').textContent = t('round');
+            document.getElementById('penaltiesLeftLabel').textContent = t('penaltiesLeft');
+            document.getElementById('thisGameLabelGame').textContent = t('thisGame');
+            document.getElementById('roundInputLabel').textContent = t('round');
+            document.getElementById('scoreInputLabel').textContent = t('scoreInput');
+            document.getElementById('penaltyPlayedLabel').textContent = t('penaltyPlayed');
+            document.getElementById('selectPenaltyOption').textContent = t('selectPenalty');
+            document.getElementById('penaltyCallerLabel').textContent = t('penaltyCaller');
+            document.getElementById('selectPlayerOption').textContent = t('selectPlayer');
+            document.getElementById('calculateBtnText').textContent = t('fillAllRequiredFields');
+            
+            // Update buttons
+            document.getElementById('historyBtnText').textContent = t('gameHistory');
+            document.getElementById('rulesBtnText').textContent = t('readRules');
+            document.getElementById('settingsBtnText').textContent = t('playerSettings');
+            document.getElementById('newGameBtnText').textContent = t('newGame');
+            
+            // Update modal titles
+            document.getElementById('gameHistoryModalTitle').textContent = t('gameHistoryModalTitle');
+            document.getElementById('gameDetailModalTitle').textContent = t('gameDetailModalTitle');
+            
+            // Update game over
+            document.getElementById('gameOverTitle').innerHTML = `🎉 ${t('gameOver')} 🎉`;
+            
+            // Update other elements
+            document.getElementById('scoreTableTitle').textContent = t('scoreTable');
+            document.getElementById('remainingPenaltiesTitle').textContent = t('remainingPenalties');
+            
+            // Update game rules
+            updateGameRules();
+            
+            // If game is started, update dynamic content while preserving values
+            if (gameState.gameStarted) {
+                updateGameScreen();
+            }
+            
+            // Update player inputs
+            updatePlayerInputs();
+        }
+
+        function updateGameRules() {
+            const rulesList = document.getElementById('gameRulesList');
+            const rules = gameState.language === 'tr' ? [
+                '• <strong>3, 4 veya 5 oyuncuyla</strong> oynanır',
+                '• <strong>13 farklı ceza</strong> türü vardır',
+                '• <strong>"Elden" cezası</strong> mecburen son elde (13. el) oynanır',
+                '• <strong>Cezayı söyleyen VE bitiren</strong> aynı kişiyse +50 puan',
+                '• <strong>Cezayı söyleyen başarısız:</strong> Görevini yapamadan (açamadan) başkası bitirirse x2 ceza puanı alır',
+                '• <strong>Son elde (Elden) bonus yok:</strong> Cezayı söyleyip bitiren +50 alamaz',
+                '• <strong>İşler kağıt atan</strong> oyuncu -50 ceza puanı alır',
+                '• <strong>Joker ile bitiren</strong> herkese x2 ceza puanı yedirir',
+                '• <strong>Kazanma:</strong> En yüksek puan kazanır (eksi puanlarda en düşük eksi puan)'
+            ] : [
+                '• Played with <strong>3, 4 or 5 players</strong>',
+                '• There are <strong>13 different penalty</strong> types',
+                '• <strong>"Going Out" penalty</strong> must be played in the last round (13th round)',
+                '• <strong>Penalty caller AND finisher</strong> gets +50 points if same person',
+                '• <strong>Failed penalty caller:</strong> Gets x2 penalty points if someone else finishes before completing',
+                '• <strong>No bonus in last round:</strong> Caller who finishes "Going Out" cannot get +50 bonus',
+                '• <strong>Useless card thrower</strong> gets -50 penalty points',
+                '• <strong>Joker finisher</strong> gives everyone x2 penalty points',
+                '• <strong>Winning:</strong> Highest score wins (lowest negative score in case of negative points)'
+            ];
+            
+            rulesList.innerHTML = rules.join('\n');
+        }
 
         // Get all penalties (default + custom)
         function getAllPenalties() {
-            return [...defaultPenalties, ...gameState.customPenalties];
+            return [...defaultPenalties, ...gameState.customPenalties].map(penalty => ({
+                ...penalty,
+                displayName: t(`penalties.${penalty.short}`, penalty.name)
+            }));
         }
 
         // Initialize the app
         function initApp() {
+            loadLanguagePreference();
             loadCustomPenalties();
             updatePlayerInputs();
             updatePlayerCount();
             updateStartButton();
+            updateLanguageToggle();
+            updateAllTexts();
             initEventListeners();
-            // Custom penalties list will be updated when needed
+        }
+
+        function loadLanguagePreference() {
+            try {
+                const saved = localStorage.getItem('americano_language');
+                if (saved && (saved === 'tr' || saved === 'en')) {
+                    gameState.language = saved;
+                }
+            } catch (error) {
+                console.error('Error loading language preference:', error);
+            }
         }
 
         function loadCustomPenalties() {
@@ -457,7 +837,7 @@
         function addPlayer() {
             if (gameState.playerCount < 5) {
                 gameState.playerCount++;
-                gameState.players.push(`Oyuncu ${gameState.playerCount}`);
+                gameState.players.push(''); // Boş string ile başlat
                 updatePlayerInputs();
                 updatePlayerCount();
                 updateStartButton();
@@ -506,10 +886,10 @@
                 const playerDiv = document.createElement('div');
                 playerDiv.className = 'rounded-lg p-4 bg-white';
                 playerDiv.innerHTML = `
-                    <label class="block text-sm font-medium mb-2 text-gray-700">Oyuncu ${index + 1}</label>
+                    <label class="block text-sm font-medium mb-2 text-gray-700">${t('player')} ${index + 1}</label>
                     <input type="text" value="${player}" onchange="updatePlayerName(${index}, this.value)"
                            class="w-full p-3 border border-gray-300 rounded-lg text-center font-medium text-lg bg-white text-black placeholder-gray-400"
-                           placeholder="Oyuncu ${index + 1}" />
+                           placeholder="${t('player')} ${index + 1}" />
                 `;
                 container.appendChild(playerDiv);
             });
@@ -534,16 +914,18 @@
             }
         }
 
-        function setStake(stake) {
-            gameState.gameStake = stake;
-            document.getElementById('gameStakeInput').value = stake;
+        function setStake(stakeKey) {
+            gameState.gameStake = t(stakeKey);
+            document.getElementById('gameStakeInput').value = gameState.gameStake;
             updateGameStakeDisplay();
         }
 
         function setCustomStake() {
-            const custom = prompt('Özel iddia yazın:');
+            const custom = prompt(gameState.language === 'tr' ? 'Özel iddia yazın:' : 'Enter custom stake:');
             if (custom) {
-                setStake(custom);
+                gameState.gameStake = custom;
+                document.getElementById('gameStakeInput').value = custom;
+                updateGameStakeDisplay();
             }
         }
 
@@ -569,18 +951,14 @@
         }
 
         function backToSetup() {
-            // Oyunu sıfırlamadan sadece setup ekranına dön
             document.getElementById('setupScreen').classList.remove('hidden');
             document.getElementById('gameScreen').classList.add('hidden');
-            // gameState.gameStarted = false; // Bu satırı kaldırdık
-            // resetGame(); // Bu satırı kaldırdık
         }
 
         function startGameFromSetup() {
             const allFilled = gameState.players.every(player => player.trim() !== '');
             if (!allFilled) return;
             
-            // Eğer oyun devam ediyorsa, sadece ekranları değiştir
             if (gameState.gameStarted) {
                 document.getElementById('setupScreen').classList.add('hidden');
                 document.getElementById('gameScreen').classList.remove('hidden');
@@ -588,9 +966,8 @@
                 return;
             }
             
-            // Yeni oyun başlat
             gameState.gameStarted = true;
-            gameState.gameStartDate = new Date().toLocaleString('tr-TR');
+            gameState.gameStartDate = new Date().toLocaleString(gameState.language === 'tr' ? 'tr-TR' : 'en-US');
             gameState.roundPenalties = {};
             gameState.players.forEach(player => {
                 gameState.roundPenalties[player] = '';
@@ -610,7 +987,6 @@
             const btn = document.getElementById('darkModeBtn');
             
             if (gameState.darkMode) {
-                // Dark mode - tüm ekranı dark yap
                 app.className = 'max-w-7xl mx-auto p-6 min-h-screen transition-colors bg-gray-900';
                 if (gameScreen) gameScreen.className = gameScreen.className.replace('bg-white', 'bg-gray-800 text-white');
                 if (setupScreen) {
@@ -618,10 +994,9 @@
                     if (setupCard) setupCard.className = setupCard.className.replace('bg-white', 'bg-gray-800 text-white');
                 }
                 btn.textContent = '☀️';
-                btn.title = 'Gündüz modu';
+                btn.title = gameState.language === 'tr' ? 'Gündüz modu' : 'Light mode';
                 btn.className = 'ml-2 p-2 rounded-lg transition-all bg-yellow-500 text-gray-900 hover:bg-yellow-400';
             } else {
-                // Light mode
                 app.className = 'max-w-7xl mx-auto p-6 min-h-screen transition-colors bg-gradient-to-br from-purple-50 to-blue-100';
                 if (gameScreen) gameScreen.className = gameScreen.className.replace('bg-gray-800 text-white', 'bg-white');
                 if (setupScreen) {
@@ -629,9 +1004,11 @@
                     if (setupCard) setupCard.className = setupCard.className.replace('bg-gray-800 text-white', 'bg-white');
                 }
                 btn.textContent = '🌙';
-                btn.title = 'Gece modu';
+                btn.title = gameState.language === 'tr' ? 'Gece modu' : 'Dark mode';
                 btn.className = 'ml-2 p-2 rounded-lg transition-all bg-gray-200 text-gray-700 hover:bg-gray-300';
             }
+            
+            updateLanguageToggle();
         }
 
         function updateGameScreen() {
@@ -641,8 +1018,27 @@
             
             updateRemainingPenalties();
             updateScoreCards();
+            
+            // Seçili değerleri koru
+            const selectedPenaltyValue = gameState.selectedPenalty;
+            const selectedCallerValue = gameState.penaltyCaller;
+            
             updatePenaltySelector();
             updatePlayerSelector();
+            
+            // Değerleri geri yükle
+            if (selectedPenaltyValue) {
+                const penaltySelect = document.getElementById('selectedPenalty');
+                penaltySelect.value = selectedPenaltyValue;
+                gameState.selectedPenalty = selectedPenaltyValue;
+            }
+            
+            if (selectedCallerValue) {
+                const callerSelect = document.getElementById('penaltyCaller');
+                callerSelect.value = selectedCallerValue;
+                gameState.penaltyCaller = selectedCallerValue;
+            }
+            
             updatePlayerInputCards();
             updateGameStakeGameDisplay();
         }
@@ -660,7 +1056,7 @@
         }
 
         function getRemainingPenalties() {
-            return penalties.filter(p => !gameState.playedPenalties[p.id]);
+            return getAllPenalties().filter(p => !gameState.playedPenalties[p.id]);
         }
 
         function getAvailablePenalties() {
@@ -669,260 +1065,6 @@
                 return available.filter(penalty => penalty.id !== 13);
             }
             return available;
-        }
-
-        // Game History Functions
-        function saveGameToHistory() {
-            const finalScores = getCurrentScores();
-            const winner = getLeader();
-            
-            const gameRecord = {
-                id: Date.now(),
-                date: new Date().toLocaleString('tr-TR'),
-                startDate: gameState.gameStartDate || new Date().toLocaleString('tr-TR'),
-                players: [...gameState.players],
-                gameStake: gameState.gameStake,
-                totalRounds: gameState.currentRound - 1,
-                finalScores: finalScores,
-                winner: winner,
-                gameHistory: [...gameState.gameHistory],
-                customPenaltiesUsed: gameState.customPenalties.filter(cp => 
-                    gameState.gameHistory.some(round => round.penaltyId === cp.id)
-                )
-            };
-
-            try {
-                const savedGames = JSON.parse(localStorage.getItem('americano_game_history') || '[]');
-                savedGames.unshift(gameRecord); // Add to beginning
-                
-                // Keep only last 50 games
-                if (savedGames.length > 50) {
-                    savedGames.splice(50);
-                }
-                
-                localStorage.setItem('americano_game_history', JSON.stringify(savedGames));
-                console.log('Game saved to history:', gameRecord);
-            } catch (error) {
-                console.error('Error saving game to history:', error);
-            }
-        }
-
-        function showGameHistory() {
-            try {
-                const savedGames = JSON.parse(localStorage.getItem('americano_game_history') || '[]');
-                const container = document.getElementById('gameHistoryList');
-                
-                if (savedGames.length === 0) {
-                    container.innerHTML = `
-                        <div class="text-center py-8 text-gray-500">
-                            <p class="text-lg">Henüz oyun geçmişi yok</p>
-                            <p class="text-sm mt-2">İlk oyununuzu tamamlayın ve burada görün</p>
-                        </div>
-                    `;
-                } else {
-                    container.innerHTML = '';
-                    savedGames.forEach((game, index) => {
-                        const gameDiv = document.createElement('div');
-                        gameDiv.className = 'bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg border hover:shadow-md transition-all cursor-pointer mb-4';
-                        gameDiv.onclick = () => showGameDetail(game);
-                        
-                        const playersText = game.players.join(', ');
-                        const scoresText = game.players.map(p => `${p}: ${game.finalScores[p]}`).join(' | ');
-                        
-                        gameDiv.innerHTML = `
-                            <div class="flex justify-between items-start">
-                                <div class="flex-1">
-                                    <div class="flex items-center gap-2 mb-2">
-                                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
-                                            Oyun #${savedGames.length - index}
-                                        </span>
-                                        <span class="text-gray-500 text-sm">${game.date}</span>
-                                    </div>
-                                    <h3 class="font-bold text-lg text-gray-800 mb-1">
-                                        🏆 Kazanan: ${game.winner} (${game.finalScores[game.winner]} puan)
-                                    </h3>
-                                    <p class="text-sm text-gray-600 mb-2">
-                                        <strong>Oyuncular:</strong> ${playersText}
-                                    </p>
-                                    <p class="text-sm text-gray-600 mb-2">
-                                        <strong>Oyun:</strong> ${game.gameStake || 'Belirtilmemiş'} | 
-                                        <strong>El Sayısı:</strong> ${game.totalRounds}
-                                    </p>
-                                    <p class="text-xs text-gray-500">
-                                        ${scoresText}
-                                    </p>
-                                </div>
-                                <div class="text-right">
-                                    <div class="text-2xl">🎮</div>
-                                    <div class="text-xs text-gray-500 mt-1">Detaylar için tıkla</div>
-                                </div>
-                            </div>
-                        `;
-                        container.appendChild(gameDiv);
-                    });
-                }
-                
-                document.getElementById('gameHistoryModal').classList.remove('hidden');
-            } catch (error) {
-                console.error('Error loading game history:', error);
-                alert('Oyun geçmişi yüklenirken hata oluştu');
-            }
-        }
-
-        function showGameDetail(game) {
-            const container = document.getElementById('gameDetailContent');
-            
-            const playersScoreCards = game.players.map(player => {
-                const score = game.finalScores[player];
-                const isWinner = player === game.winner;
-                return `
-                    <div class="bg-gradient-to-br ${isWinner ? 'from-green-100 to-green-200 border-green-300' : 'from-gray-50 to-gray-100 border-gray-200'} p-4 rounded-lg border-2">
-                        <h3 class="font-bold text-lg ${isWinner ? 'text-green-800' : 'text-gray-800'}">${player} ${isWinner ? '👑' : ''}</h3>
-                        <div class="text-2xl font-bold ${score >= 0 ? 'text-green-600' : 'text-red-600'}">
-                            ${score > 0 ? '+' : ''}${score}
-                        </div>
-                        <div class="text-sm text-gray-500">${isWinner ? 'Kazanan!' : 'puan'}</div>
-                    </div>
-                `;
-            }).join('');
-
-            const roundsTable = game.gameHistory.map((round, index) => `
-                <tr class="${index % 2 === 0 ? 'bg-gray-50' : 'bg-white'}">
-                    <td class="border p-2 text-center font-bold text-purple-600">${round.round}</td>
-                    <td class="border p-2 text-center">
-                        <div class="font-bold">${round.penaltySymbol}</div>
-                        <div class="text-xs">${round.penaltyName}</div>
-                    </td>
-                    <td class="border p-2 text-center text-blue-600">${round.penaltyCaller}</td>
-                    <td class="border p-2 text-center text-green-600">${round.winner}</td>
-                    <td class="border p-2 text-center text-xs">
-                        ${round.jokerIleBitiren ? '🃏 ' + round.jokerIleBitiren : ''}
-                        ${round.işlerKağıtAtan ? '⚠️ ' + round.işlerKağıtAtan : ''}
-                    </td>
-                </tr>
-            `).join('');
-
-            container.innerHTML = `
-                <div class="space-y-6">
-                    <!-- Game Info -->
-                    <div class="bg-blue-50 p-4 rounded-lg">
-                        <h3 class="font-bold text-lg text-blue-800 mb-2">Oyun Bilgileri</h3>
-                        <div class="grid grid-cols-2 gap-4 text-sm">
-                            <div><strong>Tarih:</strong> ${game.date}</div>
-                            <div><strong>Oyun:</strong> ${game.gameStake || 'Belirtilmemiş'}</div>
-                            <div><strong>El Sayısı:</strong> ${game.totalRounds}</div>
-                            <div><strong>Oyuncu Sayısı:</strong> ${game.players.length}</div>
-                        </div>
-                    </div>
-
-                    <!-- Final Scores -->
-                    <div>
-                        <h3 class="font-bold text-lg text-gray-800 mb-4">Final Skorları</h3>
-                        <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
-                            ${playersScoreCards}
-                        </div>
-                    </div>
-
-                    <!-- Round by Round -->
-                    <div>
-                        <h3 class="font-bold text-lg text-gray-800 mb-4">El El Detaylar</h3>
-                        <div class="overflow-x-auto">
-                            <table class="w-full border-collapse bg-white rounded-lg overflow-hidden shadow">
-                                <thead class="bg-purple-600 text-white">
-                                    <tr>
-                                        <th class="border p-2">El</th>
-                                        <th class="border p-2">Ceza</th>
-                                        <th class="border p-2">Söyleyen</th>
-                                        <th class="border p-2">Bitiren</th>
-                                        <th class="border p-2">Özel</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    ${roundsTable}
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-
-                    <!-- Custom Penalties Used -->
-                    ${game.customPenaltiesUsed?.length > 0 ? `
-                        <div>
-                            <h3 class="font-bold text-lg text-gray-800 mb-4">Kullanılan Özel Cezalar</h3>
-                            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
-                                ${game.customPenaltiesUsed.map(cp => `
-                                    <div class="bg-purple-50 p-3 rounded-lg border border-purple-200">
-                                        <div class="flex items-center gap-2">
-                                            <span class="bg-purple-100 text-purple-800 font-bold rounded-full w-6 h-6 flex items-center justify-center text-sm">
-                                                ${cp.symbol}
-                                            </span>
-                                            <div>
-                                                <div class="font-medium text-gray-800">${cp.name}</div>
-                                                <div class="text-xs text-gray-500">(${cp.short})</div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                `).join('')}
-                            </div>
-                        </div>
-                    ` : ''}
-                </div>
-            `;
-            
-            document.getElementById('gameDetailModal').classList.remove('hidden');
-        }
-
-        function closeGameHistoryModal() {
-            document.getElementById('gameHistoryModal').classList.add('hidden');
-        }
-
-        function updateRemainingPenalties() {
-            const remaining = getRemainingPenalties();
-            document.getElementById('remainingPenaltiesDisplay').textContent = remaining.length;
-            document.getElementById('remainingCount').textContent = remaining.length;
-            
-            const container = document.getElementById('remainingPenalties');
-            container.innerHTML = '';
-            
-            const available = getAvailablePenalties();
-            
-            if (available.length > 0) {
-                available.forEach(penalty => {
-                    const div = document.createElement('div');
-                    div.className = `bg-white p-3 rounded-lg border-2 transition-all ${penalty.isCustom ? 'border-purple-200 hover:border-purple-400' : 'border-yellow-200 hover:border-yellow-400'}`;
-                    div.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <span class="${penalty.isCustom ? 'bg-purple-100 text-purple-800' : 'bg-yellow-100 text-yellow-800'} font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm">
-                                ${penalty.symbol}
-                            </span>
-                            <div>
-                                <div class="font-medium text-gray-800">${penalty.name} ${penalty.isCustom ? '⚡' : ''}</div>
-                                <div class="text-xs text-gray-500">(${penalty.short})</div>
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(div);
-                });
-                
-                if (!gameState.playedPenalties[13] && available.length > 0) {
-                    const eldenDiv = document.createElement('div');
-                    eldenDiv.className = 'bg-red-50 p-3 rounded-lg border-2 border-red-200';
-                    eldenDiv.innerHTML = `
-                        <div class="flex items-center gap-3">
-                            <span class="bg-red-100 text-red-800 font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm">⑬</span>
-                            <div>
-                                <div class="font-medium text-red-700">Elden</div>
-                                <div class="text-xs text-red-500">(E) - Son elde mecburi</div>
-                            </div>
-                        </div>
-                    `;
-                    container.appendChild(eldenDiv);
-                }
-            } else {
-                const message = document.createElement('div');
-                message.className = 'text-center text-gray-500 py-4';
-                message.innerHTML = `<p class="text-lg">${remaining.length === 1 ? 'Son el - Sadece "Elden" kaldı! 🎯' : 'Tüm cezalar oynandı! 🎉'}</p>`;
-                container.appendChild(message);
-            }
         }
 
         function getCurrentScores() {
@@ -951,7 +1093,6 @@
             const scores = getCurrentScores();
             const leader = getLeader();
             const container = document.getElementById('scoreCards');
-            // Mobilde tek kolon, büyük ekranlarda dinamik
             const gridClass = 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
             
             container.className = `grid gap-4 mb-8 ${gridClass}`;
@@ -968,17 +1109,16 @@
                     <div class="text-3xl font-bold rounded-lg py-3 px-4 shadow-inner ${scoreClass}">
                         ${score > 0 ? '+' : ''}${score}
                     </div>
-                    <div class="text-sm mt-1 text-gray-500">toplam puan</div>
+                    <div class="text-sm mt-1 text-gray-500">${t('totalScore')}</div>
                 `;
                 container.appendChild(div);
             });
             
-            // Update leader banner
             const leaderBanner = document.getElementById('leaderBanner');
             const leaderText = document.getElementById('leaderText');
             
             if (leader) {
-                leaderText.textContent = `Lider: ${leader} (${scores[leader]} puan)`;
+                leaderText.textContent = `${t('leader')}: ${leader} (${scores[leader]} ${t('points')})`;
                 leaderBanner.classList.remove('hidden');
             } else {
                 leaderBanner.classList.add('hidden');
@@ -990,13 +1130,13 @@
             const remaining = getRemainingPenalties();
             const available = getAvailablePenalties();
             
-            select.innerHTML = '<option value="">Ceza seçin...</option>';
+            select.innerHTML = `<option value="">${t('selectPenalty')}</option>`;
             
             if (remaining.length === 1 && remaining[0].id === 13) {
                 select.innerHTML = '';
                 const option = document.createElement('option');
                 option.value = '13';
-                option.textContent = '⑬ Elden (Son El - Mecburi)';
+                option.textContent = `⑬ ${t('penalties.E')} (${gameState.language === 'tr' ? 'Son El - Mecburi' : 'Last Round - Mandatory'})`;
                 option.selected = true;
                 select.appendChild(option);
                 select.style.backgroundColor = '#fef2f2';
@@ -1006,21 +1146,24 @@
                 available.forEach(penalty => {
                     const option = document.createElement('option');
                     option.value = penalty.id;
-                    option.textContent = `${penalty.symbol} ${penalty.name} (${penalty.short})`;
+                    option.textContent = `${penalty.symbol} ${penalty.displayName} (${penalty.short})`;
                     select.appendChild(option);
                 });
                 select.style.backgroundColor = '';
                 select.style.color = '';
             }
             
-            // Mobil için style ekle
             select.style.fontSize = '18px';
             select.style.padding = '16px';
             
-            select.addEventListener('change', function() {
-                gameState.selectedPenalty = this.value;
-                updateCalculateButton();
-            });
+            // Event listener'ı yeniden ekle
+            select.removeEventListener('change', handlePenaltyChange);
+            select.addEventListener('change', handlePenaltyChange);
+        }
+
+        function handlePenaltyChange(event) {
+            gameState.selectedPenalty = event.target.value;
+            updateCalculateButton();
         }
 
         function updatePlayerSelector() {
@@ -1028,7 +1171,7 @@
             select.className = 'w-full p-4 md:p-3 text-lg md:text-lg min-h-[60px] md:min-h-[50px] border border-gray-300 rounded-lg font-medium';
             select.style.fontSize = '18px';
             select.style.padding = '16px';
-            select.innerHTML = '<option value="">Oyuncu seçin...</option>';
+            select.innerHTML = `<option value="">${t('selectPlayer')}</option>`;
             
             gameState.players.forEach(player => {
                 const option = document.createElement('option');
@@ -1037,11 +1180,15 @@
                 select.appendChild(option);
             });
             
-            select.addEventListener('change', function() {
-                gameState.penaltyCaller = this.value;
-                updatePlayerInputCards();
-                updateCalculateButton();
-            });
+            // Event listener'ı yeniden ekle
+            select.removeEventListener('change', handlePlayerCallerChange);
+            select.addEventListener('change', handlePlayerCallerChange);
+        }
+
+        function handlePlayerCallerChange(event) {
+            gameState.penaltyCaller = event.target.value;
+            updatePlayerInputCards();
+            updateCalculateButton();
         }
 
         function updatePlayerInputCards() {
@@ -1060,36 +1207,36 @@
                 const isWinner = gameState.roundWinner === player;
                 const penaltyInput = isWinner ? 
                     `<div class="w-full p-4 border border-gray-200 rounded-xl text-center font-bold text-2xl bg-green-50 text-green-600 h-16 flex items-center justify-center">
-                        0 (Eli Bitirdi)
+                        0 (${t('finishedRound')})
                      </div>` :
                     `<input type="number" min="0" max="13" value="${gameState.roundPenalties[player] || ''}" 
                             onchange="updatePlayerPenalty('${player}', this.value)"
                             class="w-full p-4 border border-gray-300 rounded-xl text-center font-bold text-2xl h-16" placeholder="0" />
                      <div class="text-sm text-gray-500 mt-2 text-center font-medium">
-                        <span id="penalty-preview-${player}">-${gameState.roundPenalties[player] || 0} puan</span>
+                        <span id="penalty-preview-${player}">-${gameState.roundPenalties[player] || 0} ${t('points')}</span>
                      </div>`;
                 
                 div.innerHTML = `
                     <h4 class="font-semibold text-center mb-3">${player}</h4>
                     
                     <div class="mb-3">
-                        <label class="block text-sm font-medium text-gray-700 mb-1">Bu Elde Ceza Sayısı</label>
+                        <label class="block text-sm font-medium text-gray-700 mb-1">${t('thisRoundPenalty')}</label>
                         ${penaltyInput}
                     </div>
                     
                     <button onclick="toggleRoundWinner('${player}')" 
                             class="w-full py-2 px-3 rounded-lg font-medium transition-all mb-2 ${isWinner ? 'bg-green-500 text-white shadow-lg' : 'bg-gray-200 text-gray-700 hover:bg-gray-300'}">
-                        ${isWinner ? '✓ Eli Bitirdi' : 'Eli Bitirdi'}
+                        ${isWinner ? `✓ ${t('finishedRound')}` : t('finishedRound')}
                     </button>
                     
                     <button onclick="toggleJokerWinner('${player}')" 
                             class="w-full py-2 px-3 rounded-lg font-medium transition-all mb-2 ${gameState.jokerIleBitiren === player ? 'bg-orange-500 text-white shadow-lg' : 'bg-orange-100 text-orange-700 hover:bg-orange-200'}">
-                        ${gameState.jokerIleBitiren === player ? '✓ Joker İle Bitirdi' : 'Joker İle Bitirdi'}
+                        ${gameState.jokerIleBitiren === player ? `✓ ${t('finishedWithJoker')}` : t('finishedWithJoker')}
                     </button>
                     
                     <button onclick="toggleIslerKagit('${player}')" 
                             class="w-full py-2 px-3 rounded-lg font-medium transition-all mb-2 ${gameState.işlerKağıtAtan === player ? 'bg-red-500 text-white shadow-lg' : 'bg-gray-100 text-gray-600 hover:bg-gray-200'}">
-                        ${gameState.işlerKağıtAtan === player ? '✓ İşler Kağıt Attı' : 'İşler Kağıt Attı'}
+                        ${gameState.işlerKağıtAtan === player ? `✓ ${t('threwUselessCard')}` : t('threwUselessCard')}
                     </button>
                     
                     <button onclick="toggleFailedCaller('${player}')" 
@@ -1100,8 +1247,8 @@
                                 ? 'bg-purple-500 text-white shadow-lg'
                                 : 'bg-purple-100 text-purple-700 hover:bg-purple-200'}">
                         ${gameState.penaltyCaller !== player 
-                            ? 'Sadece Ceza Söyleyen İçin'
-                            : gameState.cezayıSöyleyenAçamadı === player ? '✓ Görevini Açamadı' : 'Görevini Açamadı'
+                            ? t('onlyForCaller')
+                            : gameState.cezayıSöyleyenAçamadı === player ? `✓ ${t('failedToComplete')}` : t('failedToComplete')
                         }
                     </button>
                     
@@ -1126,21 +1273,21 @@
             let status = [];
             
             if (isWinner && isCaller && gameState.selectedPenalty !== '13') {
-                status.push('<div class="text-green-600">+50 bonus puan (Söyledi ve Bitirdi)</div>');
+                status.push(`<div class="text-green-600">${t('bonusPoints')}</div>`);
             } else if (isWinner && isCaller && gameState.selectedPenalty === '13') {
-                status.push('<div class="text-gray-500">Son elde bonus yok (Elden kuralı)</div>');
+                status.push(`<div class="text-gray-500">${t('noLastRoundBonus')}</div>`);
             }
             
             if (isJoker) {
-                status.push('<div class="text-orange-600">🃏 Joker etkisi: Herkese x2 ceza puanı</div>');
+                status.push(`<div class="text-orange-600">${t('jokerEffect')}</div>`);
             }
             
             if (isIsler) {
-                status.push('<div class="text-red-600">-50 ceza puanı (İşler kağıt)</div>');
+                status.push(`<div class="text-red-600">${t('uselessCardPenalty')}</div>`);
             }
             
             if (isFailed) {
-                status.push('<div class="text-purple-600">x2 ceza puanı (Görevini açamadı)</div>');
+                status.push(`<div class="text-purple-600">${t('failedCallerPenalty')}</div>`);
             }
             
             return status.join('');
@@ -1162,20 +1309,20 @@
                     
                     if (gameState.cezayıSöyleyenAçamadı === player && gameState.cezayıSöyleyenAçamadı !== '') {
                         multiplier *= 2;
-                        effects.push('x2 Görevini açamadı');
+                        effects.push(gameState.language === 'tr' ? 'x2 Görevini açamadı' : 'x2 Failed to complete');
                     }
                     
                     if (gameState.jokerIleBitiren && gameState.jokerIleBitiren !== '') {
                         multiplier *= 2;
-                        effects.push('x2 Joker etkisi');
+                        effects.push(gameState.language === 'tr' ? 'x2 Joker etkisi' : 'x2 Joker effect');
                     }
                     
                     const finalValue = baseValue * multiplier;
                     
                     if (effects.length > 0) {
-                        preview.innerHTML = `<span class="text-red-600 font-bold">-${finalValue} puan (${effects.join(' + ')})</span>`;
+                        preview.innerHTML = `<span class="text-red-600 font-bold">-${finalValue} ${t('points')} (${effects.join(' + ')})</span>`;
                     } else {
-                        preview.textContent = `-${baseValue} puan`;
+                        preview.textContent = `-${baseValue} ${t('points')}`;
                     }
                 }
             });
@@ -1216,14 +1363,15 @@
 
         function updateCalculateButton() {
             const btn = document.getElementById('calculateBtn');
+            const btnText = document.getElementById('calculateBtnText');
             const canCalc = canCalculate();
             
             if (canCalc) {
                 btn.className = 'px-8 py-3 rounded-lg font-bold text-white transition-all bg-purple-600 hover:bg-purple-700 hover:scale-105';
-                btn.textContent = 'Eli Kaydet ve Sonrakine Geç';
+                btnText.textContent = t('calculateRound');
             } else {
                 btn.className = 'px-8 py-3 rounded-lg font-bold text-white transition-all bg-gray-400 cursor-not-allowed';
-                btn.textContent = 'Tüm Alanları Doldurun';
+                btnText.textContent = t('fillAllRequiredFields');
             }
             
             updateWarningMessages();
@@ -1237,8 +1385,8 @@
                 const div = document.createElement('div');
                 div.className = 'mb-4 p-3 bg-purple-100 rounded-lg border border-purple-300';
                 div.innerHTML = `
-                    <p class="text-purple-800 font-medium">💜 Cezayı Söyleyen Görevini Açamadı!</p>
-                    <p class="text-sm text-purple-700 mt-1">${gameState.cezayıSöyleyenAçamadı} cezayı söyledi ama görevini açamadı - x2 ceza puanı alacak</p>
+                    <p class="text-purple-800 font-medium">💜 ${t('callerFailedWarning')}</p>
+                    <p class="text-sm text-purple-700 mt-1">${gameState.cezayıSöyleyenAçamadı} ${t('callerFailedDesc')}</p>
                 `;
                 container.appendChild(div);
             }
@@ -1247,8 +1395,8 @@
                 const div = document.createElement('div');
                 div.className = 'mb-4 p-3 bg-blue-100 rounded-lg border border-blue-300';
                 div.innerHTML = `
-                    <p class="text-blue-800 font-medium">⚠️ Son El (Elden) Kuralı</p>
-                    <p class="text-sm text-blue-700 mt-1">Bu elde cezayı söyleyip bitiren oyuncu +50 bonus alamaz</p>
+                    <p class="text-blue-800 font-medium">⚠️ ${t('lastRoundRule')}</p>
+                    <p class="text-sm text-blue-700 mt-1">${t('lastRoundRuleDesc')}</p>
                 `;
                 container.appendChild(div);
             }
@@ -1257,8 +1405,8 @@
                 const div = document.createElement('div');
                 div.className = 'mb-4 p-3 bg-orange-100 rounded-lg border border-orange-300';
                 div.innerHTML = `
-                    <p class="text-orange-800 font-medium">🃏 Joker Etkisi Aktif!</p>
-                    <p class="text-sm text-orange-700 mt-1">${gameState.jokerIleBitiren} joker ile bitirdi - Tüm ceza puanları x2 olacak</p>
+                    <p class="text-orange-800 font-medium">🃏 ${t('jokerEffectActive')}</p>
+                    <p class="text-sm text-orange-700 mt-1">${gameState.jokerIleBitiren} ${t('jokerEffectDesc')}</p>
                 `;
                 container.appendChild(div);
             }
@@ -1268,22 +1416,75 @@
                 div.className = 'mb-4 p-3 bg-yellow-100 rounded-lg border border-yellow-300';
                 const missing = [];
                 
-                if (!gameState.selectedPenalty) missing.push('• Oynanan cezayı seçin');
-                if (!gameState.penaltyCaller) missing.push('• Cezayı söyleyen oyuncuyu seçin');
-                if (!gameState.roundWinner) missing.push('• Eli bitiren oyuncuyu seçin');
+                if (!gameState.selectedPenalty) missing.push(t('selectPlayedPenalty'));
+                if (!gameState.penaltyCaller) missing.push(t('selectPenaltyCaller'));
+                if (!gameState.roundWinner) missing.push(t('selectRoundWinner'));
                 
                 const allPenaltiesFilled = gameState.players.every(player => 
                     player === gameState.roundWinner ? true : gameState.roundPenalties[player] !== undefined && gameState.roundPenalties[player] !== ''
                 );
-                if (!allPenaltiesFilled) missing.push('• Diğer oyuncuların ceza sayısını girin');
+                if (!allPenaltiesFilled) missing.push(t('enterOtherPenalties'));
                 
                 div.innerHTML = `
-                    <p class="text-yellow-800 font-medium">Eksik alanlar:</p>
+                    <p class="text-yellow-800 font-medium">${t('missingFields')}</p>
                     <ul class="text-sm text-yellow-700 mt-2">
                         ${missing.map(item => `<li>${item}</li>`).join('')}
                     </ul>
                 `;
                 container.appendChild(div);
+            }
+        }
+
+        function updateRemainingPenalties() {
+            const remaining = getRemainingPenalties();
+            document.getElementById('remainingPenaltiesDisplay').textContent = remaining.length;
+            document.getElementById('remainingCount').textContent = remaining.length;
+            
+            const container = document.getElementById('remainingPenalties');
+            container.innerHTML = '';
+            
+            const available = getAvailablePenalties();
+            
+            if (available.length > 0) {
+                available.forEach(penalty => {
+                    const div = document.createElement('div');
+                    div.className = `bg-white p-3 rounded-lg border-2 transition-all ${penalty.isCustom ? 'border-purple-200 hover:border-purple-400' : 'border-yellow-200 hover:border-yellow-400'}`;
+                    div.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <span class="${penalty.isCustom ? 'bg-purple-100 text-purple-800' : 'bg-yellow-100 text-yellow-800'} font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm">
+                                ${penalty.symbol}
+                            </span>
+                            <div>
+                                <div class="font-medium text-gray-800">${penalty.displayName} ${penalty.isCustom ? '⚡' : ''}</div>
+                                <div class="text-xs text-gray-500">(${penalty.short})</div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(div);
+                });
+                
+                if (!gameState.playedPenalties[13] && available.length > 0) {
+                    const eldenDiv = document.createElement('div');
+                    eldenDiv.className = 'bg-red-50 p-3 rounded-lg border-2 border-red-200';
+                    eldenDiv.innerHTML = `
+                        <div class="flex items-center gap-3">
+                            <span class="bg-red-100 text-red-800 font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm">⑬</span>
+                            <div>
+                                <div class="font-medium text-red-700">${t('penalties.E')}</div>
+                                <div class="text-xs text-red-500">(E) - ${gameState.language === 'tr' ? 'Son elde mecburi' : 'Mandatory in last round'}</div>
+                            </div>
+                        </div>
+                    `;
+                    container.appendChild(eldenDiv);
+                }
+            } else {
+                const message = document.createElement('div');
+                message.className = 'text-center text-gray-500 py-4';
+                const messageText = remaining.length === 1 ? 
+                    (gameState.language === 'tr' ? 'Son el - Sadece "Elden" kaldı! 🎯' : 'Last round - Only "Going Out" left! 🎯') :
+                    (gameState.language === 'tr' ? 'Tüm cezalar oynandı! 🎉' : 'All penalties played! 🎉');
+                message.innerHTML = `<p class="text-lg">${messageText}</p>`;
+                container.appendChild(message);
             }
         }
 
@@ -1299,30 +1500,25 @@
                 let originalPenalty = parseInt(gameState.roundPenalties[player]) || 0;
                 let penaltyCount = originalPenalty;
                 
-                // Cezayı söyleyen kişi görevini açamadan başkası bitirirse x2 ceza alır
                 if (player === gameState.cezayıSöyleyenAçamadı && gameState.cezayıSöyleyenAçamadı !== '') {
                     penaltyCount = originalPenalty * 2;
                 }
                 
-                // Joker ile bitiren varsa tüm oyuncuların ceza puanları 2 katına çıkar (joker atan da dahil)
                 if (gameState.jokerIleBitiren && gameState.jokerIleBitiren !== '') {
-                    // Eğer hem cezayı söyleyen açamadı hem joker etkisi varsa, önce cezayı söyleyen x2, sonra joker x2
                     if (player === gameState.cezayıSöyleyenAçamadı && gameState.cezayıSöyleyenAçamadı !== '') {
-                        penaltyCount = originalPenalty * 2 * 2; // 4 katı
+                        penaltyCount = originalPenalty * 2 * 2;
                     } else {
                         penaltyCount = originalPenalty * 2;
                     }
                 }
                 
-                // Eli bitiren oyuncunun ceza puanı 0 olur (joker ile bitiren de dahil)
                 if (player === gameState.roundWinner) {
                     penaltyCount = 0;
                     originalPenalty = 0;
                 }
                 
-                // Bonus hesaplama - SON ELDE (Elden cezası) bonus yok!
                 let bonusPoints = 0;
-                const isLastRound = gameState.selectedPenalty === '13'; // Elden cezası
+                const isLastRound = gameState.selectedPenalty === '13';
                 if (player === gameState.roundWinner && player === gameState.penaltyCaller && !isLastRound) {
                     bonusPoints = 50;
                 }
@@ -1349,7 +1545,7 @@
             gameState.gameHistory.push({
                 round: gameState.currentRound,
                 penaltyId: penalty.id,
-                penaltyName: penalty.name,
+                penaltyName: penalty.displayName,
                 penaltyShort: penalty.short,
                 penaltySymbol: penalty.symbol,
                 penaltyCaller: gameState.penaltyCaller,
@@ -1358,7 +1554,7 @@
                 cezayıSöyleyenAçamadı: gameState.cezayıSöyleyenAçamadı,
                 results: roundResults,
                 winner: gameState.roundWinner,
-                time: new Date().toLocaleTimeString('tr-TR')
+                time: new Date().toLocaleTimeString(gameState.language === 'tr' ? 'tr-TR' : 'en-US')
             });
 
             gameState.playedPenalties[penalty.id] = true;
@@ -1377,6 +1573,12 @@
             gameState.roundWinner = '';
             gameState.currentRound++;
             
+            // Selector'ları sıfırla
+            const penaltySelect = document.getElementById('selectedPenalty');
+            const callerSelect = document.getElementById('penaltyCaller');
+            if (penaltySelect) penaltySelect.value = '';
+            if (callerSelect) callerSelect.value = '';
+            
             updateGameScreen();
             updateGameHistory();
             checkGameOver();
@@ -1391,16 +1593,14 @@
             const thead = document.getElementById('gameHistoryTableHead');
             const tbody = document.getElementById('gameHistoryTableBody');
             
-            // Create header
             thead.innerHTML = `
                 <tr class="bg-purple-600 text-white">
-                    <th class="border p-3 font-bold">El</th>
-                    <th class="border p-3 font-bold">Ceza / Söyleyen</th>
+                    <th class="border p-3 font-bold">${t('round')}</th>
+                    <th class="border p-3 font-bold">${t('penalty')} / ${t('caller')}</th>
                     ${gameState.players.map(player => `<th class="border p-3 font-bold">${player}</th>`).join('')}
                 </tr>
             `;
             
-            // Create body
             tbody.innerHTML = '';
             gameState.gameHistory.forEach((round, index) => {
                 const tr = document.createElement('tr');
@@ -1409,7 +1609,7 @@
                 tr.innerHTML = `
                     <td class="border p-3 text-center">
                         <div class="font-bold text-lg text-purple-600">${round.round}</div>
-                        <div class="text-xs text-gray-500">El</div>
+                        <div class="text-xs text-gray-500">${t('round')}</div>
                     </td>
                     <td class="border p-3 font-medium text-center">
                         <div class="font-bold">${round.penaltySymbol}</div>
@@ -1449,17 +1649,125 @@
                 const leader = getLeader();
                 const scores = getCurrentScores();
                 
-                // Save game to history
                 saveGameToHistory();
                 
                 document.getElementById('roundInputSection').classList.add('hidden');
                 document.getElementById('gameOverSection').classList.remove('hidden');
-                document.getElementById('gameOverText').textContent = `Tüm cezalar oynandı. Kazanan: ${leader} (${scores[leader]} puan)`;
+                document.getElementById('gameOverText').textContent = `${t('allPenaltiesPlayed')} ${leader} (${scores[leader]} ${t('points')})`;
             }
         }
 
+        function saveGameToHistory() {
+            const finalScores = getCurrentScores();
+            const winner = getLeader();
+            
+            const gameRecord = {
+                id: Date.now(),
+                date: new Date().toLocaleString(gameState.language === 'tr' ? 'tr-TR' : 'en-US'),
+                startDate: gameState.gameStartDate || new Date().toLocaleString(gameState.language === 'tr' ? 'tr-TR' : 'en-US'),
+                players: [...gameState.players],
+                gameStake: gameState.gameStake,
+                totalRounds: gameState.currentRound - 1,
+                finalScores: finalScores,
+                winner: winner,
+                gameHistory: [...gameState.gameHistory],
+                customPenaltiesUsed: gameState.customPenalties.filter(cp => 
+                    gameState.gameHistory.some(round => round.penaltyId === cp.id)
+                ),
+                language: gameState.language
+            };
+
+            try {
+                const savedGames = JSON.parse(localStorage.getItem('americano_game_history') || '[]');
+                savedGames.unshift(gameRecord);
+                
+                if (savedGames.length > 50) {
+                    savedGames.splice(50);
+                }
+                
+                localStorage.setItem('americano_game_history', JSON.stringify(savedGames));
+            } catch (error) {
+                console.error('Error saving game to history:', error);
+            }
+        }
+
+        function showGameHistory() {
+            try {
+                const savedGames = JSON.parse(localStorage.getItem('americano_game_history') || '[]');
+                const container = document.getElementById('gameHistoryList');
+                
+                if (savedGames.length === 0) {
+                    container.innerHTML = `
+                        <div class="text-center py-8 text-gray-500">
+                            <p class="text-lg">${t('noGameHistory')}</p>
+                            <p class="text-sm mt-2">${t('completeFirstGame')}</p>
+                        </div>
+                    `;
+                } else {
+                    container.innerHTML = '';
+                    savedGames.forEach((game, index) => {
+                        const gameDiv = document.createElement('div');
+                        gameDiv.className = 'bg-gradient-to-r from-blue-50 to-green-50 p-4 rounded-lg border hover:shadow-md transition-all cursor-pointer mb-4';
+                        gameDiv.onclick = () => showGameDetail(game);
+                        
+                        const playersText = game.players.join(', ');
+                        const scoresText = game.players.map(p => `${p}: ${game.finalScores[p]}`).join(' | ');
+                        
+                        gameDiv.innerHTML = `
+                            <div class="flex justify-between items-start">
+                                <div class="flex-1">
+                                    <div class="flex items-center gap-2 mb-2">
+                                        <span class="bg-blue-100 text-blue-800 px-2 py-1 rounded-full text-xs font-medium">
+                                            ${gameState.language === 'tr' ? 'Oyun' : 'Game'} #${savedGames.length - index}
+                                        </span>
+                                        <span class="text-gray-500 text-sm">${game.date}</span>
+                                    </div>
+                                    <h3 class="font-bold text-lg text-gray-800 mb-1">
+                                        🏆 ${gameState.language === 'tr' ? 'Kazanan' : 'Winner'}: ${game.winner} (${game.finalScores[game.winner]} ${t('points')})
+                                    </h3>
+                                    <p class="text-sm text-gray-600 mb-2">
+                                        <strong>${gameState.language === 'tr' ? 'Oyuncular' : 'Players'}:</strong> ${playersText}
+                                    </p>
+                                    <p class="text-sm text-gray-600 mb-2">
+                                        <strong>${gameState.language === 'tr' ? 'Oyun' : 'Game'}:</strong> ${game.gameStake || (gameState.language === 'tr' ? 'Belirtilmemiş' : 'Not specified')} | 
+                                        <strong>${gameState.language === 'tr' ? 'El Sayısı' : 'Round Count'}:</strong> ${game.totalRounds}
+                                    </p>
+                                    <p class="text-xs text-gray-500">
+                                        ${scoresText}
+                                    </p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-2xl">🎮</div>
+                                    <div class="text-xs text-gray-500 mt-1">${gameState.language === 'tr' ? 'Detaylar için tıkla' : 'Click for details'}</div>
+                                </div>
+                            </div>
+                        `;
+                        container.appendChild(gameDiv);
+                    });
+                }
+                
+                document.getElementById('gameHistoryModal').classList.remove('hidden');
+            } catch (error) {
+                console.error('Error loading game history:', error);
+                alert(gameState.language === 'tr' ? 'Oyun geçmişi yüklenirken hata oluştu' : 'Error loading game history');
+            }
+        }
+
+        function showGameDetail(game) {
+            // Game detail implementation would be here
+            // This is a simplified version
+            alert(gameState.language === 'tr' ? 'Oyun detayları yakında eklenecek' : 'Game details coming soon');
+        }
+
+        function closeGameHistoryModal() {
+            document.getElementById('gameHistoryModal').classList.add('hidden');
+        }
+
+        function closeGameDetailModal() {
+            document.getElementById('gameDetailModal').classList.add('hidden');
+        }
+
         function resetGame() {
-            // Gerçekten yeni oyun başlatmak için
             gameState.gameStarted = false;
             gameState.currentRound = 1;
             gameState.selectedPenalty = '';
@@ -1480,33 +1788,24 @@
             document.getElementById('gameOverSection').classList.add('hidden');
             document.getElementById('gameHistorySection').classList.add('hidden');
             
-            // Setup ekranına dön
             document.getElementById('setupScreen').classList.remove('hidden');
             document.getElementById('gameScreen').classList.add('hidden');
         }
 
         function showRules() {
-            document.getElementById('rulesModal').classList.remove('hidden');
-        }
-
-        function showRules() {
-            document.getElementById('rulesModal').classList.remove('hidden');
-        }
-
-        function closeRules() {
-            document.getElementById('rulesModal').classList.add('hidden');
+            alert(gameState.language === 'tr' ? 'Kurallar modal\'ı yakında eklenecek' : 'Rules modal coming soon');
         }
 
         // Initialize app when page loads
         document.addEventListener('DOMContentLoaded', initApp);
     </script>
 
-    <!-- Rules Modal -->
+    <!-- Rules Modal (to be implemented) -->
     <div id="rulesModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
         <div class="max-w-4xl w-full max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white">
             <div class="sticky top-0 p-6 border-b bg-white border-gray-200">
                 <div class="flex justify-between items-center">
-                    <h2 class="text-2xl font-bold text-gray-800">📖 Detaylı Americano Kuralları</h2>
+                    <h2 id="rulesModalTitle" class="text-2xl font-bold text-gray-800">📖 Detaylı Americano Kuralları</h2>
                     <button onclick="closeRules()" class="p-2 rounded-lg transition-all bg-gray-100 hover:bg-gray-200 text-gray-700">
                         ✕
                     </button>
@@ -1515,45 +1814,8 @@
             
             <div class="p-6">
                 <div class="space-y-6 text-gray-700">
-                    <div>
-                        <h5 class="font-semibold text-lg mb-3 text-blue-700">🎯 Oyun Malzemeleri:</h5>
-                        <ul class="space-y-1 ml-4">
-                            <li>• <strong>52'lik deste + 4 Joker</strong> ile oynanan kağıt oyunudur</li>
-                            <li>• <strong>Min 3, Max 5 kişi</strong> ile oynanır</li>
-                            <li>• <strong>Her oyuncuya 13 kağıt</strong> dağıtılır</li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h5 class="font-semibold text-lg mb-3 text-blue-700">📚 Terimler Sözlüğü:</h5>
-                        <ul class="space-y-1 ml-4">
-                            <li>• <strong>Küt:</strong> Aynı rakamın farklı kart çeşitleri (örnek: 3♠, 3♥, 3♦)</li>
-                            <li>• <strong>Seri:</strong> Bir kart çeşidinin sıralı şekilde bulunması (örnek: 2♠, 3♠, 4♠)</li>
-                            <li>• <strong>Joker:</strong> İstenilen kart yerine geçer</li>
-                            <li>• <strong>İşler Kağıt:</strong> Yere atılan ve başka oyuncuya yaramayan kart (-50 puan)</li>
-                            <li>• <strong>Ceza Kartı:</strong> Sırası olmayan oyuncunun çektiği ekstra kart</li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h5 class="font-semibold text-lg mb-3 text-blue-700">🏆 Puan Sistemi:</h5>
-                        <ul class="space-y-1 ml-4">
-                            <li>• <strong>Cezayı söyleyen + bitiren:</strong> +50 bonus puan</li>
-                            <li>• <strong>Cezayı söyleyen başarısız:</strong> Görevini yapamadan (açamadan) başkası bitirirse x2 ceza puanı alır</li>
-                            <li>• <strong>İşler kağıt atan:</strong> -50 ceza puanı</li>
-                            <li>• <strong>Joker ile bitiren:</strong> Herkese x2 ceza puanı</li>
-                            <li>• <strong>Son elde bonus yok:</strong> Elden cezasında +50 bonus alınamaz</li>
-                        </ul>
-                    </div>
-
-                    <div>
-                        <h5 class="font-semibold text-lg mb-3 text-purple-700">⚡ Yeni Özellikler:</h5>
-                        <ul class="space-y-1 ml-4">
-                            <li>• <strong>Özel Cezalar:</strong> Kendi ceza türlerinizi oluşturabilirsiniz</li>
-                            <li>• <strong>Oyun Geçmişi:</strong> Tüm oyunlarınız kaydedilir ve detaylarıyla görüntüleyebilirsiniz</li>
-                            <li>• <strong>Mobil Uyumlu:</strong> Telefonda rahatça kullanabilirsiniz</li>
-                        </ul>
-                    </div>
+                    <!-- Rules content would be here -->
+                    <p class="text-center text-gray-500">Rules content coming soon...</p>
                 </div>
             </div>
         </div>
