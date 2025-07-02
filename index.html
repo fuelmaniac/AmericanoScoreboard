@@ -21,11 +21,17 @@
         
         /* Mobil için özel input styling */
         @media (max-width: 768px) {
+            /* Tüm grid'leri mobilde tek kolona zorla */
+            .grid {
+                grid-template-columns: 1fr !important;
+            }
+            
             input[type="text"], input[type="number"], select {
                 font-size: 18px !important;
                 padding: 16px !important;
                 min-height: 60px !important;
                 line-height: 1.2 !important;
+                width: 100% !important;
             }
             
             input::placeholder {
@@ -38,6 +44,19 @@
             select:focus {
                 font-size: 18px !important;
                 transform: scale(1);
+            }
+            
+            /* Button'ları da büyült */
+            button {
+                min-height: 48px !important;
+                font-size: 14px !important;
+                padding: 12px 16px !important;
+            }
+            
+            /* Player cards'ını daha geniş yap */
+            .grid > div {
+                width: 100% !important;
+                margin-bottom: 16px;
             }
         }
     </style>
@@ -76,7 +95,7 @@
                 <!-- Player Names Section -->
                 <div class="rounded-xl p-6 mb-6 bg-yellow-50">
                     <h3 class="font-bold text-lg mb-4 text-center text-gray-800">Oyuncu İsimleri</h3>
-                    <div id="playerInputs" class="grid gap-4 grid-cols-3">
+                    <div id="playerInputs" class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                         <!-- Player inputs will be dynamically generated -->
                     </div>
                 </div>
@@ -160,7 +179,7 @@
             </div>
 
             <!-- Score Cards -->
-            <div id="scoreCards" class="grid gap-4 mb-8 grid-cols-3">
+            <div id="scoreCards" class="grid gap-4 mb-8 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                 <!-- Score cards will be dynamically generated -->
             </div>
 
@@ -186,7 +205,7 @@
                 </div>
                 
                 <!-- Player Input Cards -->
-                <div id="playerInputCards" class="grid gap-4 mb-6 grid-cols-3">
+                <div id="playerInputCards" class="grid gap-4 mb-6 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                     <!-- Player input cards will be dynamically generated -->
                 </div>
                 
@@ -645,9 +664,8 @@
             const scores = getCurrentScores();
             const leader = getLeader();
             const container = document.getElementById('scoreCards');
-            const gridClass = gameState.playerCount === 3 ? 'grid-cols-3' : 
-                             gameState.playerCount === 4 ? 'grid-cols-2 md:grid-cols-4' : 
-                             'grid-cols-2 md:grid-cols-3 lg:grid-cols-5';
+            // Mobilde tek kolon, büyük ekranlarda dinamik
+            const gridClass = 'grid-cols-1 md:grid-cols-2 lg:grid-cols-3';
             
             container.className = `grid gap-4 mb-8 ${gridClass}`;
             container.innerHTML = '';
@@ -657,7 +675,7 @@
                 const scoreClass = score >= 0 ? 'text-green-600 bg-green-50' : 'text-red-600 bg-red-50';
                 
                 const div = document.createElement('div');
-                div.className = 'rounded-xl p-6 border text-center bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200';
+                div.className = 'rounded-xl p-6 border text-center bg-gradient-to-br from-gray-50 to-gray-100 border-gray-200 w-full';
                 div.innerHTML = `
                     <h3 class="font-bold text-lg mb-2 text-gray-800">${player}</h3>
                     <div class="text-3xl font-bold rounded-lg py-3 px-4 shadow-inner ${scoreClass}">
