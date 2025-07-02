@@ -355,7 +355,7 @@
                     </button>
                     <!-- Language Toggle in Game -->
                     <div class="ml-2">
-                        <div id="languageToggleGame" class="language-toggle" onclick="toggleLanguage()">
+                        <div id="languageToggleGame" class="language-toggle" onclick="event.stopPropagation(); toggleLanguage()">
                             <div id="langTrGame" class="language-option active">TR</div>
                             <div id="langEnGame" class="language-option inactive">EN</div>
                         </div>
@@ -1133,14 +1133,22 @@
                 const isMandatory = penalty.id === 13; // Elden is mandatory
                 
                 const div = document.createElement('div');
-                div.className = `p-3 border-2 rounded-lg transition-all ${isActive ? 'border-purple-300 bg-purple-50' : 'border-gray-200 bg-gray-50'}`;
+                div.className = `p-3 border-2 rounded-lg transition-all cursor-pointer ${isActive ? 'border-purple-300 bg-purple-50' : 'border-gray-200 bg-gray-50'}`;
+                div.onclick = (e) => {
+                    e.stopPropagation();
+                    if (!isMandatory) {
+                        togglePenalty(penalty.id);
+                        updatePenaltyManagementModal();
+                    }
+                };
                 div.innerHTML = `
-                    <label class="flex items-center gap-3 cursor-pointer">
+                    <div class="flex items-center gap-3">
                         <input type="checkbox" 
                                ${isActive ? 'checked' : ''} 
                                ${isMandatory ? 'disabled' : ''}
-                               onchange="togglePenalty(${penalty.id})"
-                               class="w-5 h-5 text-purple-600 rounded" />
+                               onclick="event.stopPropagation()"
+                               onchange="togglePenalty(${penalty.id}); updatePenaltyManagementModal()"
+                               class="w-5 h-5 text-purple-600 rounded pointer-events-auto" />
                         <span class="${isActive ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'} font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm">
                             ${penalty.symbol}
                         </span>
@@ -1151,7 +1159,7 @@
                             </div>
                             <div class="text-xs text-gray-500">(${penalty.short})</div>
                         </div>
-                    </label>
+                    </div>
                 `;
                 container.appendChild(div);
             });
@@ -1165,13 +1173,19 @@
                 const isActive = gameState.activePenalties.includes(penalty.id);
                 
                 const div = document.createElement('div');
-                div.className = `p-3 border-2 rounded-lg transition-all ${isActive ? 'border-orange-300 bg-orange-50' : 'border-gray-200 bg-gray-50'}`;
+                div.className = `p-3 border-2 rounded-lg transition-all cursor-pointer ${isActive ? 'border-orange-300 bg-orange-50' : 'border-gray-200 bg-gray-50'}`;
+                div.onclick = (e) => {
+                    e.stopPropagation();
+                    togglePenalty(penalty.id);
+                    updatePenaltyManagementModal();
+                };
                 div.innerHTML = `
-                    <label class="flex items-center gap-3 cursor-pointer">
+                    <div class="flex items-center gap-3">
                         <input type="checkbox" 
                                ${isActive ? 'checked' : ''} 
-                               onchange="togglePenalty(${penalty.id})"
-                               class="w-5 h-5 text-orange-600 rounded" />
+                               onclick="event.stopPropagation()"
+                               onchange="togglePenalty(${penalty.id}); updatePenaltyManagementModal()"
+                               class="w-5 h-5 text-orange-600 rounded pointer-events-auto" />
                         <span class="${isActive ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800'} font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm">
                             ${penalty.symbol}
                         </span>
@@ -1181,7 +1195,7 @@
                             </div>
                             <div class="text-xs text-gray-500">(${penalty.short})</div>
                         </div>
-                    </label>
+                    </div>
                 `;
                 container.appendChild(div);
             });
@@ -1205,13 +1219,19 @@
                 const isActive = gameState.activePenalties.includes(penalty.id);
                 
                 const div = document.createElement('div');
-                div.className = `p-3 border-2 rounded-lg transition-all ${isActive ? 'border-green-300 bg-green-50' : 'border-gray-200 bg-gray-50'}`;
+                div.className = `p-3 border-2 rounded-lg transition-all cursor-pointer ${isActive ? 'border-green-300 bg-green-50' : 'border-gray-200 bg-gray-50'}`;
+                div.onclick = (e) => {
+                    e.stopPropagation();
+                    togglePenalty(penalty.id);
+                    updatePenaltyManagementModal();
+                };
                 div.innerHTML = `
-                    <label class="flex items-center gap-3 cursor-pointer">
+                    <div class="flex items-center gap-3">
                         <input type="checkbox" 
                                ${isActive ? 'checked' : ''} 
-                               onchange="togglePenalty(${penalty.id})"
-                               class="w-5 h-5 text-green-600 rounded" />
+                               onclick="event.stopPropagation()"
+                               onchange="togglePenalty(${penalty.id}); updatePenaltyManagementModal()"
+                               class="w-5 h-5 text-green-600 rounded pointer-events-auto" />
                         <span class="${isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'} font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm">
                             ${penalty.symbol}
                         </span>
@@ -1221,11 +1241,11 @@
                             </div>
                             <div class="text-xs text-gray-500">(${penalty.short})</div>
                         </div>
-                        <button onclick="deleteCustomPenalty(${penalty.id})" 
+                        <button onclick="event.stopPropagation(); deleteCustomPenalty(${penalty.id})" 
                                 class="text-red-500 hover:text-red-700 p-1">
                             🗑️
                         </button>
-                    </label>
+                    </div>
                 `;
                 container.appendChild(div);
             });
