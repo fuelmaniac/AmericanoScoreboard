@@ -63,7 +63,7 @@
                 <div class="rounded-xl p-6 mb-6 bg-orange-50">
                     <h3 class="font-bold text-lg mb-4 text-center text-gray-800">Bu Oyun Neye Oynanıyor?</h3>
                     <div class="mb-4">
-                        <input type="text" id="gameStakeInput" class="w-full p-3 border border-gray-300 rounded-lg text-center font-medium text-lg"
+                        <input type="text" id="gameStakeInput" class="w-full p-4 text-xl border border-gray-300 rounded-lg text-center font-medium"
                                placeholder="Örnek: Kahve ısmarlama, Yemek ısmarlama..." />
                     </div>
                     <div class="grid grid-cols-2 md:grid-cols-3 gap-2">
@@ -285,7 +285,7 @@
         let gameState = {
             gameStarted: false,
             playerCount: 3,
-            players: ['Sabri', 'Şadiye', 'Gökhan'],
+            players: ['', '', ''],
             darkMode: false,
             gameStake: '',
             currentRound: 1,
@@ -442,9 +442,30 @@
         }
 
         function startGame() {
+            startGameFromSetup();
+        }
+
+        function backToSetup() {
+            // Oyunu sıfırlamadan sadece setup ekranına dön
+            document.getElementById('setupScreen').classList.remove('hidden');
+            document.getElementById('gameScreen').classList.add('hidden');
+            // gameState.gameStarted = false; // Bu satırı kaldırdık
+            // resetGame(); // Bu satırı kaldırdık
+        }
+
+        function startGameFromSetup() {
             const allFilled = gameState.players.every(player => player.trim() !== '');
             if (!allFilled) return;
             
+            // Eğer oyun devam ediyorsa, sadece ekranları değiştir
+            if (gameState.gameStarted) {
+                document.getElementById('setupScreen').classList.add('hidden');
+                document.getElementById('gameScreen').classList.remove('hidden');
+                updateGameScreen();
+                return;
+            }
+            
+            // Yeni oyun başlat
             gameState.gameStarted = true;
             gameState.roundPenalties = {};
             gameState.players.forEach(player => {
@@ -457,25 +478,32 @@
             updateGameScreen();
         }
 
-        function backToSetup() {
-            gameState.gameStarted = false;
-            document.getElementById('setupScreen').classList.remove('hidden');
-            document.getElementById('gameScreen').classList.add('hidden');
-            resetGame();
-        }
-
         function toggleDarkMode() {
             gameState.darkMode = !gameState.darkMode;
             const app = document.getElementById('app');
+            const gameScreen = document.getElementById('gameScreen');
+            const setupScreen = document.getElementById('setupScreen');
             const btn = document.getElementById('darkModeBtn');
             
             if (gameState.darkMode) {
-                app.className = app.className.replace('bg-gradient-to-br from-purple-50 to-blue-100', 'bg-gray-900');
+                // Dark mode - tüm ekranı dark yap
+                app.className = 'max-w-7xl mx-auto p-6 min-h-screen transition-colors bg-gray-900';
+                if (gameScreen) gameScreen.className = gameScreen.className.replace('bg-white', 'bg-gray-800 text-white');
+                if (setupScreen) {
+                    const setupCard = setupScreen.querySelector('.bg-white');
+                    if (setupCard) setupCard.className = setupCard.className.replace('bg-white', 'bg-gray-800 text-white');
+                }
                 btn.textContent = '☀️';
                 btn.title = 'Gündüz modu';
                 btn.className = 'ml-2 p-2 rounded-lg transition-all bg-yellow-500 text-gray-900 hover:bg-yellow-400';
             } else {
-                app.className = app.className.replace('bg-gray-900', 'bg-gradient-to-br from-purple-50 to-blue-100');
+                // Light mode
+                app.className = 'max-w-7xl mx-auto p-6 min-h-screen transition-colors bg-gradient-to-br from-purple-50 to-blue-100';
+                if (gameScreen) gameScreen.className = gameScreen.className.replace('bg-gray-800 text-white', 'bg-white');
+                if (setupScreen) {
+                    const setupCard = setupScreen.querySelector('.bg-gray-800');
+                    if (setupCard) setupCard.className = setupCard.className.replace('bg-gray-800 text-white', 'bg-white');
+                }
                 btn.textContent = '🌙';
                 btn.title = 'Gece modu';
                 btn.className = 'ml-2 p-2 rounded-lg transition-all bg-gray-200 text-gray-700 hover:bg-gray-300';
@@ -1093,6 +1121,8 @@
         }
 
         function resetGame() {
+            // Gerçekten yeni oyun başlatmak için
+            gameState.gameStarted = false;
             gameState.currentRound = 1;
             gameState.selectedPenalty = '';
             gameState.penaltyCaller = '';
@@ -1112,9 +1142,9 @@
             document.getElementById('gameOverSection').classList.add('hidden');
             document.getElementById('gameHistorySection').classList.add('hidden');
             
-            if (gameState.gameStarted) {
-                updateGameScreen();
-            }
+            // Setup ekranına dön
+            document.getElementById('setupScreen').classList.remove('hidden');
+            document.getElementById('gameScreen').classList.add('hidden');
         }
 
         function showRules() {
