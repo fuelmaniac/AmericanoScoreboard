@@ -115,7 +115,139 @@
                             <div id="languageToggle" class="language-toggle" onclick="toggleLanguage()">
                                 <div id="langTr" class="language-option active">TR</div>
                                 <div id="langEn" class="language-option inactive">EN</div>
+                                <!-- Penalty Management Modal -->
+        <div id="penaltyManagementModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50">
+            <div class="max-w-6xl w-full max-h-[90vh] overflow-y-auto rounded-2xl shadow-2xl bg-white">
+                <div class="sticky top-0 p-6 border-b bg-white border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <div>
+                            <h2 id="penaltyManagementModalTitle" class="text-2xl font-bold text-gray-800">🎯 Cezaları Yönet</h2>
+                            <p class="text-gray-600 mt-1">
+                                <span id="selectedCountDisplay" class="font-bold text-purple-600">13</span> / 13 
+                                <span id="penaltyCountLabel">ceza seçili</span>
+                            </p>
+                        </div>
+                        <button onclick="closePenaltyManagement()" class="p-2 rounded-lg transition-all bg-gray-100 hover:bg-gray-200 text-gray-700">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <!-- Warning Message -->
+                    <div id="penaltyWarning" class="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg hidden">
+                        <p class="text-red-800 font-medium" id="penaltyWarningText">
+                            Tam olarak 13 ceza seçmelisiniz
+                        </p>
+                    </div>
+
+                    <!-- Default Penalties Section -->
+                    <div class="mb-8">
+                        <h3 id="defaultPenaltiesTitle" class="text-xl font-bold text-gray-800 mb-4">📋 Varsayılan Cezalar</h3>
+                        <div id="defaultPenaltiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <!-- Default penalties will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Difficult Penalties Section -->
+                    <div class="mb-8">
+                        <h3 id="difficultPenaltiesTitle" class="text-xl font-bold text-gray-800 mb-4">🧠 Zor Cezalar</h3>
+                        <p id="difficultPenaltiesDesc" class="text-gray-600 mb-4">Daha zorlu oyun deneyimi için özel cezalar</p>
+                        <div id="difficultPenaltiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <!-- Difficult penalties will be populated here -->
+                        </div>
+                    </div>
+
+                    <!-- Custom Penalties Section -->
+                    <div class="mb-8">
+                        <div class="flex justify-between items-center mb-4">
+                            <h3 id="customPenaltiesTitle" class="text-xl font-bold text-gray-800">⚡ Özel Cezalar</h3>
+                            <button onclick="openAddPenaltyModal()" id="addNewPenaltyBtn" class="px-4 py-2 bg-green-600 hover:bg-green-700 text-white font-medium rounded-lg transition-all">
+                                ➕ <span id="addNewPenaltyText">Yeni Ceza Ekle</span>
+                            </button>
+                        </div>
+                        <div id="customPenaltiesList" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-3">
+                            <!-- Custom penalties will be populated here -->
+                        </div>
+                        <div id="noCustomPenalties" class="text-center py-8 text-gray-500">
+                            <p id="noCustomPenaltiesText">Henüz özel ceza eklenmemiş</p>
+                            <p class="text-sm mt-1" id="addCustomPenaltyHint">Yukarıdaki butona tıklayarak yeni ceza ekleyebilirsiniz</p>
+                        </div>
+                    </div>
+
+                    <!-- Action Buttons -->
+                    <div class="flex gap-4 justify-center pt-6 border-t border-gray-200">
+                        <button onclick="resetToDefaultPenalties()" id="resetDefaultsBtn" class="px-6 py-3 bg-gray-500 hover:bg-gray-600 text-white font-bold rounded-lg transition-all">
+                            🔄 <span id="resetDefaultsText">Varsayılanlara Sıfırla</span>
+                        </button>
+                        <button onclick="applyPenaltySelection()" id="applyPenaltiesBtn" class="px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition-all">
+                            ✅ <span id="applyPenaltiesText">Cezaları Uygula</span>
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <!-- Add New Penalty Modal -->
+        <div id="addPenaltyModal" class="hidden fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center p-4 z-50" style="z-index: 60;">
+            <div class="max-w-md w-full rounded-2xl shadow-2xl bg-white">
+                <div class="p-6 border-b bg-white border-gray-200">
+                    <div class="flex justify-between items-center">
+                        <h2 id="addPenaltyModalTitle" class="text-2xl font-bold text-gray-800">➕ Yeni Ceza Ekle</h2>
+                        <button onclick="closeAddPenaltyModal()" class="p-2 rounded-lg transition-all bg-gray-100 hover:bg-gray-200 text-gray-700">
+                            ✕
+                        </button>
+                    </div>
+                </div>
+                
+                <div class="p-6">
+                    <form id="addPenaltyForm" onsubmit="saveNewPenalty(event)">
+                        <div class="space-y-4">
+                            <div>
+                                <label id="penaltyNameLabel" class="block text-sm font-medium text-gray-700 mb-2">Ceza Adı:</label>
+                                <input type="text" id="newPenaltyName" required 
+                                       class="w-full p-3 border border-gray-300 rounded-lg font-medium"
+                                       placeholder="Örnek: 6'lı Seri" />
                             </div>
+                            
+                            <div>
+                                <label id="penaltyShortLabel" class="block text-sm font-medium text-gray-700 mb-2">Kısa Ad:</label>
+                                <input type="text" id="newPenaltyShort" required maxlength="10"
+                                       class="w-full p-3 border border-gray-300 rounded-lg font-medium"
+                                       placeholder="Örnek: 6S" />
+                            </div>
+                            
+                            <div>
+                                <label id="penaltySymbolLabel" class="block text-sm font-medium text-gray-700 mb-2">Sembol:</label>
+                                <input type="text" id="newPenaltySymbol" readonly
+                                       class="w-full p-3 border border-gray-300 rounded-lg font-medium bg-gray-100"
+                                       placeholder="Otomatik oluşturulacak" />
+                            </div>
+                            
+                            <div class="bg-blue-50 p-4 rounded-lg">
+                                <p id="addPenaltyNote" class="text-sm text-blue-700">
+                                    <strong>Not:</strong> Eklediğiniz özel ceza, normal cezalar gibi oyunda kullanılabilecek.
+                                    Sembol otomatik olarak oluşturulacak.
+                                </p>
+                            </div>
+                        </div>
+                        
+                        <div class="flex gap-3 mt-6">
+                            <button type="button" onclick="closeAddPenaltyModal()" id="cancelAddPenalty"
+                                    class="flex-1 py-3 px-4 border border-gray-300 rounded-lg font-medium text-gray-700 hover:bg-gray-50 transition-all">
+                                İptal
+                            </button>
+                            <button type="submit" id="submitAddPenalty"
+                                    class="flex-1 py-3 px-4 bg-purple-600 text-white rounded-lg font-medium hover:bg-purple-700 transition-all">
+                                Ceza Ekle
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+        </div>
+
+    </div>
                         </div>
                     </div>
                     <p id="setupSubtitle" class="text-gray-600">Oyuncu sayısı ve isimlerini ayarlayın</p>
@@ -143,6 +275,21 @@
                     <h3 id="playerNamesTitle" class="font-bold text-lg mb-4 text-center text-gray-800">Oyuncu İsimleri</h3>
                     <div id="playerInputs" class="grid gap-4 grid-cols-1 md:grid-cols-2 lg:grid-cols-3">
                         <!-- Player inputs will be dynamically generated -->
+                    </div>
+                </div>
+
+                <!-- Penalty Management Section -->
+                <div class="rounded-xl p-6 mb-6 bg-purple-50">
+                    <h3 id="penaltyManagementTitle" class="font-bold text-lg mb-4 text-center text-gray-800">🎯 Cezaları Yönet</h3>
+                    <div class="text-center">
+                        <p id="penaltyManagementDesc" class="text-gray-600 mb-4">Oyunda kullanılacak cezaları özelleştirin</p>
+                        <div class="mb-4">
+                            <span id="activePenaltyCount" class="bg-purple-100 text-purple-800 px-3 py-2 rounded-full font-bold">13</span>
+                            <span class="text-gray-600 ml-2" id="activePenaltyLabel">ceza seçili</span>
+                        </div>
+                        <button id="managePenaltiesBtn" onclick="openPenaltyManagement()" class="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition-all">
+                            ⚙️ <span id="managePenaltiesBtnText">Cezaları Yönet</span>
+                        </button>
                     </div>
                 </div>
 
@@ -436,7 +583,19 @@
                     "24K": "2 4'lü Küt",
                     "5S": "5'li Seri",
                     "Ç": "Çift",
-                    "E": "Elden"
+                    "E": "Elden",
+                    // Difficult penalties
+                    "5Ç": "5 Çift",
+                    "6Ç": "6 Çift",
+                    "7Ç": "7 Çift",
+                    "34K": "3 x 4'lü Küt",
+                    "34S": "3 x 4'lü Seri",
+                    "7S": "7'li Seri",
+                    "8S": "8'li Seri",
+                    "43K": "4 x 3'lü Küt",
+                    "43S": "4 x 3'lü Seri",
+                    "33S1K": "3 x 3'lü Seri + 1 Küt",
+                    "33K1S": "3 x 3'lü Küt + 1 Seri"
                 },
                 
                 // Modal titles
@@ -477,7 +636,28 @@
                 selectPlayedPenalty: '• Oynanan cezayı seçin',
                 selectPenaltyCaller: '• Cezayı söyleyen oyuncuyu seçin',
                 selectRoundWinner: '• Eli bitiren oyuncuyu seçin',
-                enterOtherPenalties: '• Diğer oyuncuların ceza sayısını girin'
+                enterOtherPenalties: '• Diğer oyuncuların ceza sayısını girin',
+                
+                // Penalty Management
+                managePenalties: 'Cezaları Yönet',
+                penaltiesSelected: 'Ceza Seçili',
+                selectPenaltiesToPlay: 'Oyunda kullanılacak cezaları seçin',
+                defaultPenalties: 'Varsayılan Cezalar',
+                difficultPenalties: 'Zor Cezalar',
+                customPenalties: 'Özel Cezalar',
+                addNewPenalty: 'Yeni Ceza Ekle',
+                exactly13Required: 'Tam olarak 13 ceza seçmelisiniz',
+                penaltyCount: 'ceza',
+                goingOutMandatory: '(Zorunlu)',
+                penaltyName: 'Ceza Adı',
+                penaltyShort: 'Kısa Ad',
+                penaltySymbol: 'Sembol',
+                autoGenerated: 'Otomatik oluşturulacak',
+                addPenalty: 'Ceza Ekle',
+                cancel: 'İptal',
+                penaltyNote: 'Eklediğiniz özel ceza, normal cezalar gibi oyunda kullanılabilecek.',
+                resetToDefaults: 'Varsayılanlara Sıfırla',
+                applyPenalties: 'Cezaları Uygula'
             },
             en: {
                 // Setup Screen
@@ -544,7 +724,19 @@
                     "24K": "2 4-Card Sets",
                     "5S": "5-Card Sequence",
                     "Ç": "Pair",
-                    "E": "Going Out"
+                    "E": "Going Out",
+                    // Difficult penalties
+                    "5Ç": "5 Pairs",
+                    "6Ç": "6 Pairs",
+                    "7Ç": "7 Pairs",
+                    "34K": "3 x 4-Card Sets",
+                    "34S": "3 x 4-Card Sequences",
+                    "7S": "7-Card Sequence",
+                    "8S": "8-Card Sequence",
+                    "43K": "4 x 3-Card Sets",
+                    "43S": "4 x 3-Card Sequences",
+                    "33S1K": "3 x 3-Card Sequences + 1 Set",
+                    "33K1S": "3 x 3-Card Sets + 1 Sequence"
                 },
                 
                 // Modal titles
@@ -585,7 +777,28 @@
                 selectPlayedPenalty: '• Select the played penalty',
                 selectPenaltyCaller: '• Select the penalty caller',
                 selectRoundWinner: '• Select the round winner',
-                enterOtherPenalties: '• Enter other players\' penalty counts'
+                enterOtherPenalties: '• Enter other players\' penalty counts',
+                
+                // Penalty Management
+                managePenalties: 'Manage Penalties',
+                penaltiesSelected: 'Penalties Selected',
+                selectPenaltiesToPlay: 'Select penalties to use in game',
+                defaultPenalties: 'Default Penalties',
+                difficultPenalties: 'Difficult Penalties',
+                customPenalties: 'Custom Penalties',
+                addNewPenalty: 'Add New Penalty',
+                exactly13Required: 'You must select exactly 13 penalties',
+                penaltyCount: 'penalties',
+                goingOutMandatory: '(Mandatory)',
+                penaltyName: 'Penalty Name',
+                penaltyShort: 'Short Name',
+                penaltySymbol: 'Symbol',
+                autoGenerated: 'Will be auto-generated',
+                addPenalty: 'Add Penalty',
+                cancel: 'Cancel',
+                penaltyNote: 'Your custom penalty will be available like normal penalties in the game.',
+                resetToDefaults: 'Reset to Defaults',
+                applyPenalties: 'Apply Penalties'
             }
         };
 
@@ -608,7 +821,10 @@
             gameHistory: [],
             playedPenalties: {},
             customPenalties: [],
-            gameStartDate: null
+            gameStartDate: null,
+            // Penalty Management
+            activePenalties: [], // Oyunda kullanılacak aktif cezalar
+            penaltyManagementOpen: false
         };
 
         let defaultPenalties = [
@@ -625,6 +841,21 @@
             { id: 11, name: "5S", short: "5S", symbol: "⑪", isCustom: false },
             { id: 12, name: "Ç", short: "Ç", symbol: "⑫", isCustom: false },
             { id: 13, name: "E", short: "E", symbol: "⑬", isCustom: false }
+        ];
+
+        // Preset difficult penalties
+        let difficultPenalties = [
+            { id: 14, name: "5Ç", short: "5Ç", symbol: "⑭", isCustom: false, isDifficult: true },
+            { id: 15, name: "6Ç", short: "6Ç", symbol: "⑮", isCustom: false, isDifficult: true },
+            { id: 16, name: "7Ç", short: "7Ç", symbol: "⑯", isCustom: false, isDifficult: true },
+            { id: 17, name: "34K", short: "34K", symbol: "⑰", isCustom: false, isDifficult: true },
+            { id: 18, name: "34S", short: "34S", symbol: "⑱", isCustom: false, isDifficult: true },
+            { id: 19, name: "7S", short: "7S", symbol: "⑲", isCustom: false, isDifficult: true },
+            { id: 20, name: "8S", short: "8S", symbol: "⑳", isCustom: false, isDifficult: true },
+            { id: 21, name: "43K", short: "43K", symbol: "㉑", isCustom: false, isDifficult: true },
+            { id: 22, name: "43S", short: "43S", symbol: "㉒", isCustom: false, isDifficult: true },
+            { id: 23, name: "33S1K", short: "33S1K", symbol: "㉓", isCustom: false, isDifficult: true },
+            { id: 24, name: "33K1S", short: "33K1S", symbol: "㉔", isCustom: false, isDifficult: true }
         ];
 
         // Translation helper function
@@ -694,6 +925,13 @@
             document.getElementById('playerCountTitle').textContent = t('playerCount');
             document.getElementById('playerCountDesc').textContent = t('playerCountDesc');
             document.getElementById('playerNamesTitle').textContent = t('playerNames');
+            
+            // Penalty Management
+            document.getElementById('penaltyManagementTitle').textContent = `🎯 ${t('managePenalties')}`;
+            document.getElementById('penaltyManagementDesc').textContent = t('selectPenaltiesToPlay');
+            document.getElementById('activePenaltyLabel').textContent = `${t('penaltyCount')} ${t('penaltiesSelected').toLowerCase()}`;
+            document.getElementById('managePenaltiesBtnText').textContent = t('managePenalties');
+            
             document.getElementById('gameStakeTitle').textContent = t('gameStakeTitle');
             document.getElementById('gameStakeInput').placeholder = t('gameStakePlaceholder');
             document.getElementById('startGameBtn').innerHTML = t('startGame');
@@ -707,6 +945,32 @@
             document.getElementById('funBtn').innerHTML = `🎉 ${t('fun').split(' ')[0] === 'Sadece' ? 'Eğlence' : 'Fun'}`;
             document.getElementById('moneyBtn').innerHTML = `💰 ${t('money')}`;
             document.getElementById('customBtn').innerHTML = `✏️ ${t('custom')}`;
+            
+            // Update penalty management modal texts
+            document.getElementById('penaltyManagementModalTitle').textContent = `🎯 ${t('managePenalties')}`;
+            document.getElementById('penaltyCountLabel').textContent = `${t('penaltyCount')} ${t('penaltiesSelected').toLowerCase()}`;
+            document.getElementById('penaltyWarningText').textContent = t('exactly13Required');
+            document.getElementById('defaultPenaltiesTitle').textContent = `📋 ${t('defaultPenalties')}`;
+            document.getElementById('difficultPenaltiesTitle').textContent = `🧠 ${t('difficultPenalties')}`;
+            document.getElementById('difficultPenaltiesDesc').textContent = gameState.language === 'tr' ? 'Daha zorlu oyun deneyimi için özel cezalar' : 'Special penalties for more challenging gameplay';
+            document.getElementById('customPenaltiesTitle').textContent = `⚡ ${t('customPenalties')}`;
+            document.getElementById('addNewPenaltyText').textContent = t('addNewPenalty');
+            document.getElementById('noCustomPenaltiesText').textContent = gameState.language === 'tr' ? 'Henüz özel ceza eklenmemiş' : 'No custom penalties added yet';
+            document.getElementById('addCustomPenaltyHint').textContent = gameState.language === 'tr' ? 'Yukarıdaki butona tıklayarak yeni ceza ekleyebilirsiniz' : 'Click the button above to add a new penalty';
+            document.getElementById('resetDefaultsText').textContent = t('resetToDefaults');
+            document.getElementById('applyPenaltiesText').textContent = t('applyPenalties');
+            
+            // Add penalty modal texts
+            document.getElementById('addPenaltyModalTitle').textContent = `➕ ${t('addNewPenalty')}`;
+            document.getElementById('penaltyNameLabel').textContent = `${t('penaltyName')}:`;
+            document.getElementById('penaltyShortLabel').textContent = `${t('penaltyShort')}:`;
+            document.getElementById('penaltySymbolLabel').textContent = `${t('penaltySymbol')}:`;
+            document.getElementById('newPenaltyName').placeholder = gameState.language === 'tr' ? "Örnek: 6'lı Seri" : "Example: 6-Card Sequence";
+            document.getElementById('newPenaltyShort').placeholder = gameState.language === 'tr' ? "Örnek: 6S" : "Example: 6S";
+            document.getElementById('newPenaltySymbol').placeholder = t('autoGenerated');
+            document.getElementById('addPenaltyNote').innerHTML = `<strong>${gameState.language === 'tr' ? 'Not' : 'Note'}:</strong> ${t('penaltyNote')}`;
+            document.getElementById('cancelAddPenalty').textContent = t('cancel');
+            document.getElementById('submitAddPenalty').textContent = t('addPenalty');
             
             // Update game screen texts
             document.getElementById('roundLabel').textContent = t('round');
@@ -739,6 +1003,11 @@
             
             // Update game rules
             updateGameRules();
+            
+            // If penalty management is open, update it
+            if (gameState.penaltyManagementOpen) {
+                updatePenaltyManagementModal();
+            }
             
             // If game is started, update dynamic content while preserving values
             if (gameState.gameStarted) {
@@ -776,23 +1045,39 @@
             rulesList.innerHTML = rules.join('\n');
         }
 
-        // Get all penalties (default + custom)
+        // Get all penalties (default + difficult + custom)
         function getAllPenalties() {
-            return [...defaultPenalties, ...gameState.customPenalties].map(penalty => ({
+            return [...defaultPenalties, ...difficultPenalties, ...gameState.customPenalties].map(penalty => ({
                 ...penalty,
                 displayName: t(`penalties.${penalty.short}`, penalty.name)
             }));
+        }
+
+        // Get active penalties for game
+        function getActivePenalties() {
+            if (gameState.activePenalties.length === 0) {
+                // Default: all default penalties
+                gameState.activePenalties = [...defaultPenalties.map(p => p.id)];
+            }
+            return getAllPenalties().filter(p => gameState.activePenalties.includes(p.id));
         }
 
         // Initialize the app
         function initApp() {
             loadLanguagePreference();
             loadCustomPenalties();
+            
+            // Initialize active penalties with defaults
+            if (gameState.activePenalties.length === 0) {
+                gameState.activePenalties = [...defaultPenalties.map(p => p.id)];
+            }
+            
             updatePlayerInputs();
             updatePlayerCount();
             updateStartButton();
             updateLanguageToggle();
             updateAllTexts();
+            updateActivePenaltyDisplay();
             initEventListeners();
         }
 
@@ -816,6 +1101,263 @@
             } catch (error) {
                 console.error('Error loading custom penalties:', error);
                 gameState.customPenalties = [];
+            }
+        }
+
+        // Penalty Management Functions
+        function openPenaltyManagement() {
+            gameState.penaltyManagementOpen = true;
+            updatePenaltyManagementModal();
+            document.getElementById('penaltyManagementModal').classList.remove('hidden');
+        }
+
+        function closePenaltyManagement() {
+            gameState.penaltyManagementOpen = false;
+            document.getElementById('penaltyManagementModal').classList.add('hidden');
+        }
+
+        function updatePenaltyManagementModal() {
+            updateDefaultPenaltiesList();
+            updateDifficultPenaltiesList();
+            updateCustomPenaltiesList();
+            updatePenaltyCount();
+            updatePenaltyWarning();
+        }
+
+        function updateDefaultPenaltiesList() {
+            const container = document.getElementById('defaultPenaltiesList');
+            container.innerHTML = '';
+            
+            defaultPenalties.forEach(penalty => {
+                const isActive = gameState.activePenalties.includes(penalty.id);
+                const isMandatory = penalty.id === 13; // Elden is mandatory
+                
+                const div = document.createElement('div');
+                div.className = `p-3 border-2 rounded-lg transition-all ${isActive ? 'border-purple-300 bg-purple-50' : 'border-gray-200 bg-gray-50'}`;
+                div.innerHTML = `
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" 
+                               ${isActive ? 'checked' : ''} 
+                               ${isMandatory ? 'disabled' : ''}
+                               onchange="togglePenalty(${penalty.id})"
+                               class="w-5 h-5 text-purple-600 rounded" />
+                        <span class="${isActive ? 'bg-purple-100 text-purple-800' : 'bg-gray-100 text-gray-800'} font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm">
+                            ${penalty.symbol}
+                        </span>
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-800">
+                                ${t(`penalties.${penalty.short}`, penalty.name)} 
+                                ${isMandatory ? `<span class="text-xs text-red-600">${t('goingOutMandatory')}</span>` : ''}
+                            </div>
+                            <div class="text-xs text-gray-500">(${penalty.short})</div>
+                        </div>
+                    </label>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateDifficultPenaltiesList() {
+            const container = document.getElementById('difficultPenaltiesList');
+            container.innerHTML = '';
+            
+            difficultPenalties.forEach(penalty => {
+                const isActive = gameState.activePenalties.includes(penalty.id);
+                
+                const div = document.createElement('div');
+                div.className = `p-3 border-2 rounded-lg transition-all ${isActive ? 'border-orange-300 bg-orange-50' : 'border-gray-200 bg-gray-50'}`;
+                div.innerHTML = `
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" 
+                               ${isActive ? 'checked' : ''} 
+                               onchange="togglePenalty(${penalty.id})"
+                               class="w-5 h-5 text-orange-600 rounded" />
+                        <span class="${isActive ? 'bg-orange-100 text-orange-800' : 'bg-gray-100 text-gray-800'} font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm">
+                            ${penalty.symbol}
+                        </span>
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-800">
+                                ${t(`penalties.${penalty.short}`, penalty.name)} 🧠
+                            </div>
+                            <div class="text-xs text-gray-500">(${penalty.short})</div>
+                        </div>
+                    </label>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function updateCustomPenaltiesList() {
+            const container = document.getElementById('customPenaltiesList');
+            const noCustomDiv = document.getElementById('noCustomPenalties');
+            
+            if (gameState.customPenalties.length === 0) {
+                container.classList.add('hidden');
+                noCustomDiv.classList.remove('hidden');
+                return;
+            }
+            
+            container.classList.remove('hidden');
+            noCustomDiv.classList.add('hidden');
+            container.innerHTML = '';
+            
+            gameState.customPenalties.forEach(penalty => {
+                const isActive = gameState.activePenalties.includes(penalty.id);
+                
+                const div = document.createElement('div');
+                div.className = `p-3 border-2 rounded-lg transition-all ${isActive ? 'border-green-300 bg-green-50' : 'border-gray-200 bg-gray-50'}`;
+                div.innerHTML = `
+                    <label class="flex items-center gap-3 cursor-pointer">
+                        <input type="checkbox" 
+                               ${isActive ? 'checked' : ''} 
+                               onchange="togglePenalty(${penalty.id})"
+                               class="w-5 h-5 text-green-600 rounded" />
+                        <span class="${isActive ? 'bg-green-100 text-green-800' : 'bg-gray-100 text-gray-800'} font-bold rounded-full w-8 h-8 flex items-center justify-center text-sm">
+                            ${penalty.symbol}
+                        </span>
+                        <div class="flex-1">
+                            <div class="font-medium text-gray-800">
+                                ${penalty.name} ⚡
+                            </div>
+                            <div class="text-xs text-gray-500">(${penalty.short})</div>
+                        </div>
+                        <button onclick="deleteCustomPenalty(${penalty.id})" 
+                                class="text-red-500 hover:text-red-700 p-1">
+                            🗑️
+                        </button>
+                    </label>
+                `;
+                container.appendChild(div);
+            });
+        }
+
+        function togglePenalty(penaltyId) {
+            const index = gameState.activePenalties.indexOf(penaltyId);
+            if (index > -1) {
+                // Remove penalty (except Elden which is mandatory)
+                if (penaltyId !== 13) {
+                    gameState.activePenalties.splice(index, 1);
+                }
+            } else {
+                // Add penalty
+                gameState.activePenalties.push(penaltyId);
+            }
+            
+            updatePenaltyCount();
+            updatePenaltyWarning();
+        }
+
+        function updatePenaltyCount() {
+            const count = gameState.activePenalties.length;
+            document.getElementById('selectedCountDisplay').textContent = count;
+            document.getElementById('activePenaltyCount').textContent = count;
+        }
+
+        function updatePenaltyWarning() {
+            const count = gameState.activePenalties.length;
+            const warning = document.getElementById('penaltyWarning');
+            const applyBtn = document.getElementById('applyPenaltiesBtn');
+            
+            if (count !== 13) {
+                warning.classList.remove('hidden');
+                applyBtn.disabled = true;
+                applyBtn.className = 'px-8 py-3 bg-gray-400 text-white font-bold rounded-lg cursor-not-allowed';
+            } else {
+                warning.classList.add('hidden');
+                applyBtn.disabled = false;
+                applyBtn.className = 'px-8 py-3 bg-purple-600 hover:bg-purple-700 text-white font-bold rounded-lg transition-all';
+            }
+        }
+
+        function resetToDefaultPenalties() {
+            gameState.activePenalties = [...defaultPenalties.map(p => p.id)];
+            updatePenaltyManagementModal();
+        }
+
+        function applyPenaltySelection() {
+            if (gameState.activePenalties.length !== 13) {
+                alert(t('exactly13Required'));
+                return;
+            }
+            
+            closePenaltyManagement();
+            updateActivePenaltyDisplay();
+        }
+
+        function updateActivePenaltyDisplay() {
+            const count = gameState.activePenalties.length;
+            document.getElementById('activePenaltyCount').textContent = count;
+        }
+
+        function openAddPenaltyModal() {
+            document.getElementById('addPenaltyModal').classList.remove('hidden');
+            document.getElementById('newPenaltyName').value = '';
+            document.getElementById('newPenaltyShort').value = '';
+            updateNewPenaltySymbol();
+            
+            // Add event listeners for real-time symbol update
+            const nameInput = document.getElementById('newPenaltyName');
+            const shortInput = document.getElementById('newPenaltyShort');
+            
+            nameInput.removeEventListener('input', updateNewPenaltySymbol);
+            shortInput.removeEventListener('input', updateNewPenaltySymbol);
+            nameInput.addEventListener('input', updateNewPenaltySymbol);
+            shortInput.addEventListener('input', updateNewPenaltySymbol);
+        }
+
+        function closeAddPenaltyModal() {
+            document.getElementById('addPenaltyModal').classList.add('hidden');
+        }
+
+        function updateNewPenaltySymbol() {
+            const nextId = Math.max(...getAllPenalties().map(p => p.id)) + 1;
+            const symbol = getSymbolForId(nextId);
+            document.getElementById('newPenaltySymbol').value = symbol;
+        }
+
+        function getSymbolForId(id) {
+            if (id <= 20) {
+                return String.fromCharCode(9311 + id); // ①②③...⑳
+            } else {
+                return String.fromCharCode(12860 + id - 20); // ㉑㉒㉓...
+            }
+        }
+
+        function saveNewPenalty(event) {
+            event.preventDefault();
+            
+            const name = document.getElementById('newPenaltyName').value.trim();
+            const short = document.getElementById('newPenaltyShort').value.trim();
+            
+            if (!name || !short) {
+                alert(gameState.language === 'tr' ? 'Lütfen tüm alanları doldurun!' : 'Please fill all fields!');
+                return;
+            }
+            
+            const nextId = Math.max(...getAllPenalties().map(p => p.id)) + 1;
+            const symbol = getSymbolForId(nextId);
+            
+            const newPenalty = {
+                id: nextId,
+                name: name,
+                short: short,
+                symbol: symbol,
+                isCustom: true
+            };
+            
+            gameState.customPenalties.push(newPenalty);
+            saveCustomPenaltiesToStorage();
+            
+            closeAddPenaltyModal();
+            updatePenaltyManagementModal();
+        }
+
+        function deleteCustomPenalty(penaltyId) {
+            if (confirm(gameState.language === 'tr' ? 'Bu cezayı silmek istediğinizden emin misiniz?' : 'Are you sure you want to delete this penalty?')) {
+                gameState.customPenalties = gameState.customPenalties.filter(p => p.id !== penaltyId);
+                gameState.activePenalties = gameState.activePenalties.filter(id => id !== penaltyId);
+                saveCustomPenaltiesToStorage();
+                updatePenaltyManagementModal();
             }
         }
 
@@ -1056,7 +1598,7 @@
         }
 
         function getRemainingPenalties() {
-            return getAllPenalties().filter(p => !gameState.playedPenalties[p.id]);
+            return getActivePenalties().filter(p => !gameState.playedPenalties[p.id]);
         }
 
         function getAvailablePenalties() {
@@ -1493,7 +2035,7 @@
             
             const scores = getCurrentScores();
             const roundResults = [];
-            const allPenalties = getAllPenalties();
+            const allPenalties = getActivePenalties(); // Use active penalties instead of all penalties
             const penalty = allPenalties.find(p => p.id === parseInt(gameState.selectedPenalty));
 
             gameState.players.forEach(player => {
